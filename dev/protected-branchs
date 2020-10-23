@@ -1,0 +1,4 @@
+# This file specify which branchs of your project is subject to continious integration checks
+dev
+master
+perf
