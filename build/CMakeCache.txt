@@ -149,8 +149,17 @@ CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 //Dependencies for target
 EXT_SRC_LIB_DEPENDS:STATIC=
 
+//Dependencies for target
+INTERN_SRC_LIB_DEPENDS:STATIC=
+
 //Path to a program.
 PYTHON_EXECUTABLE:FILEPATH=/usr/bin/python3
+
+//Dependencies for target
+eprof2_LIB_DEPENDS:STATIC=
+
+//Dependencies for target
+eprof_LIB_DEPENDS:STATIC=
 
 //Path to a library.
 libstdbuf:FILEPATH=/usr/lib/x86_64-linux-gnu/coreutils/libstdbuf.so
@@ -240,7 +249,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=3
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=14
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

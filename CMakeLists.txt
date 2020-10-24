@@ -109,13 +109,13 @@ endif()
 #TODO manage the libs folders,
 
 #Getting external projects sources in another lib
-add_subdirectory(extern/normal/src)
+add_subdirectory(extern)
 
 # Including other libs
 #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/normal/lib/eprof/libs/C)
 
 # Building main executable if there is and getting all src in a library
-add_subdirectory(src)
+add_subdirectory(code)
 
 
 

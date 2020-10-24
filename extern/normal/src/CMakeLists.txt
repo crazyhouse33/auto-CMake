@@ -1,8 +1,8 @@
 set(ARCHIVE_OUTPUT_DIRECTORY ${SOURCELIBDIR})
 
 get_C_sources(${CMAKE_CURRENT_SOURCE_DIR} EXT_SRC_FILES)
-JOIN("${EXT_SRC_FILES}" \n\t pretty)
-message ("\nDetected external sources in ${CMAKE_CURRENT_SOURCE_DIR} ${pretty}")
+JOIN("${EXT_SRC_FILES}" "\n\t" pretty)
+message ("\nDetected external sources in ${CMAKE_CURRENT_SOURCE_DIR}:\n\t${pretty}")
 
 
 
