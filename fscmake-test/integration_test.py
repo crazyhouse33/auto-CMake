@@ -19,7 +19,7 @@ def cmake_configure(add_args='', expected=0, dont_match=False):
 
 
 def cmake_build(target, expected=0, dont_match=False):
-    exec_match('cmake --build --target '+target, expected,'build', dont_match=dont_match)
+    exec_match('cmake --build . --target '+target, expected,'build', dont_match=dont_match)
 
 working_configurations =['', '-DINTERAL_LIBS_MODE=STATIC', 
 

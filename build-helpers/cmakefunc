@@ -25,32 +25,41 @@ ENDMACRO()
 
 
 # Append/return non hidden subdirectories and dir to out
-FUNCTION(get_non_hidden_subdirectories directory out)
+MACRO(get_non_hidden_subdirectories directory out)
 SUBDIRLIST(subdirs ${directory})
 list (APPEND ${out} ${directory})
 get_filename_component(absdirectory ${directory} REALPATH )
 FOREACH(sub ${subdirs})
 	string(REPLACE ${absdirectory} "" relative ${sub}) #Here lie the trick to not include .git and other bullshit
 	IF (NOT ${relative} MATCHES ".*/\\..*")
-		message ("\tAdding ${sub} as include dir.") 
-		list (APPEND ${out} ${relative})
+		list (APPEND ${out} ${sub})
 	ENDIF()
 ENDFOREACH()
-#We always append directory even if is hidden
-ENDFUNCTION(get_non_hidden_subdirectories)
+ENDMACRO(get_non_hidden_subdirectories)
 
-# Take a dictionary, add the shubdirs that are not hidden (.git and other traps) and add them to include dir
-function(include_subdirectories directory)
-# We always add directory
-message("\nAdding subdirs of ${directory} as include directory:\n")
-get_non_hidden_subdirectories(directory, subdirs)
-FOREACH(sub ${subdirs})
+MACRO(get_include_dirs dir out)
+get_non_hidden_subdirectories( ${dir} ${out})
+#Filter thoses that dont contain any .h
 
-	message ("\tAdding ${sub} as include dir.") 
-	include_directories(${sub})
+ENDMACRO()
 
-ENDFOREACH()
-ENDFUNCTION(include_subdirectories)
+MACRO(add_include_dirs dir)
+get_include_dirs( ${dir} out)
+JOIN("${out}" "\n\t\t" pretty)
+message ("\n\tAdding include dirs:\n\n\t\t${pretty}")
+include_directories(${out})
+ENDMACRO()
+
+
+MACRO(add_include_dirs_target dir target)
+
+get_include_dirs( ${dir} out)
+
+JOIN("${out}" "\n\t\t" pretty)
+message ("\n\tAdding include dirs:\n\n\t\t${pretty}")
+target_include_directories(${target} PUBLIC ${out})
+
+ENDMACRO()
 
 
 #Join a list with GLUE

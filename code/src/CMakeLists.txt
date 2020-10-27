@@ -2,13 +2,18 @@ set(ARCHIVE_OUTPUT_DIRECTORY ${SOURCELIBDIR})
 
 get_C_sources(${CMAKE_CURRENT_SOURCE_DIR} INTERN_SRC_FILES)
 JOIN("${INTERN_SRC_FILES}" \n\t pretty)
-message ("\nDetected internal sources in code/src:\n ${pretty}")
+message ("\nDetected internal sources in code/src:\n\t${pretty}")
 
 
 
 add_library(INTERN_SRC ${INTERAL_LIBS_MODE} ${INTERN_SRC_FILES})
-get_non_hidden_subdirectories( ${CMAKE_CURRENT_SOURCE_DIR} sub_dirs)
-target_include_directories(INTERN_SRC PUBLIC ${sub_dirs})
+add_include_dirs_target( ${CMAKE_CURRENT_SOURCE_DIR} INTERN_SRC)
+
+get_property(EXTERNAL_LIBS_FROM_PROJECT GLOBAL PROPERTY EXTERNAL_LIBS_FROM_PROJECT)
+
+# ADDING the other important component of normal build INTERN_SRC should nename NORMAL_SRC, but we cant "copy" lib in cmake
+message("\n\n Internal sources linked with: EXT_SRC ${EXTERNAL_LIBS_FROM_PROJECT} ${LIB_FROM_SYSTEM}")
+target_link_libraries( INTERN_SRC PUBLIC EXT_SRC ${EXTERNAL_LIBS_FROM_PROJECT} ${LIB_FROM_SYSTEM} )
 
 # Here if user want to install shared but we used static as backend, we need to recreate the lib in missing mode
 
@@ -16,6 +21,7 @@ if (INSTALL_SOURCES_AS_STATIC_LIB )
 	if (${INTERAL_LIBS_MODE} EQUAL SHARED)
 		add_library(INTERN_SRC_ALTERNATE_MODE STATIC ${INTERN_SRC})
 		target_include_directories(INTERN_SRC_ALTERNATE_MODE PUBLIC ${sub_dirs})
+		target_link_libraries( INTERN_SRC_ALTERNATE_MODE PUBLIC EXT_SRC ${EXTERNAL_LIBS_FROM_PROJECT} ${LIB_FROM_SYSTEM})
 		set(TO_INSTALL INTERN_SRC_ALTERNATE_MODE)
 	else()
 		set(TO_INSTALL INTERN_SRC)
@@ -30,6 +36,8 @@ if (INSTALL_SOURCES_AS_SHARED_LIB )
 	if(${INTERAL_LIBS_MODE} EQUAL STATIC)
 		add_library(INTERN_SRC_ALTERNATE_MODE SHARED ${INTERN_SRC_FILES})
 		target_include_directories(INTERN_SRC_ALTERNATE_MODE PUBLIC ${sub_dirs})
+		target_link_libraries( INTERN_SRC_ALTERNATE_MODE PUBLIC EXT_SRC ${EXTERNAL_LIBS_FROM_PROJECT} ${LIB_FROM_SYSTEM})
+
 		set (TO_INSTALL INTERN_SRC_ALTERNATE_MODE)
 	else()
 		set (TO_INSTALL INTERN_SRC)

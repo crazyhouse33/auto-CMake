@@ -15,4 +15,7 @@ int main(){
 	ext_test_lib();
 	ext_test_src();
 
+	//Call to system lib
+	return omp_in_parallel();//suposed to be 0
+
 }

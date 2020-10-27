@@ -1,3 +1,5 @@
+# Compile test internal lib and link to external 
+add_subdirectory(src)
 
 # Compile and link tests
 add_subdirectory(entry)

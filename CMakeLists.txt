@@ -75,9 +75,9 @@ set_if_not_set (INTERAL_LIBS_MODE SHARED)
 #set_if_not_set (INSTALL_SOURCES_AS_STATIC_LIB my_static_lib_name)
 #set_if_not_set (INSTALL_SOURCES_AS_SHARED_LIB my_shared_lib_name)
 
-# Control external lib dependencies. Dont put normal libs in test again
-#set_if_not_set(NEEDED_EXTERNAL_LIBS pthread opencl )
-#set_if_not_set(NEEDED_EXTERNAL_LIBS_TEST munit )
+# Control external lib dependencies from the system. Dont remove theses lines subcmakes need them
+set_if_not_set(LIB_FROM_SYSTEM  "")
+set_if_not_set(LIB_FROM_SYSTEM_TEST "")
 
 #STOP-MODIFY----------------------------------------------------------
 
@@ -92,24 +92,23 @@ set(CMAKE_C_FLAGS "-fdiagnostics-color=always")
 #allow C programs to get the version
 add_definitions("-D${PROJECT_NAME}_VERSION=${version}")
 
+set_property(GLOBAL PROPERTY EXTERNAL_LIBS_FROM_PROJECT)
+set_property(GLOBAL PROPERTY EXTERNAL_LIBS_TEST_FROM_PROJECT)
+
+
+
 
 # Configure asked stuff
 add_subdirectory(build-helpers/configure)
 #if we are not in master, we need to us templates to fill some files for master
-set ( CONFIGURE_DIR ${CMAKE_SOURCE_DIR}/dev/push_release_to_master)
-if(EXISTS "${CONFIGURE_DIR}")
-configure_file(${CONFIGURE_DIR}/push_to_master.py.cmake_template ${CONFIGURE_DIR}/push_to_master.py)#give python version number
 
-configure_file(${CONFIGURE_DIR}/README.md.cmake_template ${CMAKE_SOURCE_DIR}/README.md)#give readme version number
 
-endif()
 
-###### Separating test and normal build sources   #######
 
-#TODO manage the libs folders,
-
-#Getting external projects sources in another lib
+# Getting external projects sources in another lib
 add_subdirectory(extern)
+
+
 
 # Including other libs
 #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/normal/lib/eprof/libs/C)

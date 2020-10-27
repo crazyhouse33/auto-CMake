@@ -7,7 +7,7 @@ foreach(file ${TESTS})
   message ("\t${file} detected as a test to compile")
   get_filename_component (name_without_extension ${file} NAME_WE)
   add_executable(${name_without_extension} ${file})
-  target_link_libraries(${name_without_extension} TEST_INTERN_SRC INTERN_SRC EXT_SRC EXT_TEST_SRC)
+  target_link_libraries(${name_without_extension} TEST_INTERN_SRC INTERN_SRC)
   add_test(NAME ${name_without_extension} COMMAND ${name_without_extension} WORKING_DIRECTORY ${DATA_TEST_DIR})
 endforeach()
 

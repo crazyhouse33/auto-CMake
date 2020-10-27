@@ -1,19 +1,5 @@
-SET(Python_ADDITIONAL_VERSIONS 3 3.6 3.5 3.4 3.3 3.2 3.1 3.0)
-find_package(PythonInterp) # The building process use python to provide lazy-testing
-if (NOT PythonInterp_FOUND)
-	message(WARNING "Python is not found, lazy testing wont be active")
-endif()
-
-
-DIR_AND_SUBDIRS_LIST(libpath1 /usr/lib/x86_64-linux-gnu/coreutils/)
-
-list(APPEND CMAKE_LIBRARY_PATH ${libpath1})
-
-find_library (libstdbuf NAMES libstdbuf stdbuf libstdbuf.so)
-if(NOT libstdbuf)
-  message(WARNING "libstdbuf library not found in ${CMAKE_LIBRARY_PATH}\nDid you install coreutils?. This mean that the timing attack may wont be as precise as it could. ")
-else()
-
-add_definitions(-DLIBSTDBUF_PATH="${libstdbuf}")
-message ("lbstbuf detected at ${libstdbuf}")
-endif()
+MACRO(find_libraries libs)
+FOREACH(lib ${libs}
+find_library( ${lib} {lib})
+ENDFOREACH()
+ENDMACRO(find_libraries)
