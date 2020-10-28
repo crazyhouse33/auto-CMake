@@ -1,8 +1,18 @@
 set(ARCHIVE_OUTPUT_DIRECTORY ${SOURCELIBDIR})
 
+get_property(LIB_FROM_SYSTEM GLOBAL PROPERTY LIB_FROM_SYSTEM)
+message("GOOOOOOOOOOT ${LIB_FROM_SYSTEM}")
+
+if (${LIB_FROM_SYSTEM})
+message("\nFinding system libs: ${LIB_FROM_SYSTEM}")
+find_libraries("${LIB_FROM_SYSTEM}")
+endif()
+
+
 get_C_sources(${CMAKE_CURRENT_SOURCE_DIR} INTERN_SRC_FILES)
 JOIN("${INTERN_SRC_FILES}" \n\t pretty)
-message ("\nDetected internal sources in code/src:\n\t${pretty}")
+
+message ("\nDetected internal sources in code/src:\n\n\t${pretty}")
 
 
 
@@ -12,7 +22,7 @@ add_include_dirs_target( ${CMAKE_CURRENT_SOURCE_DIR} INTERN_SRC)
 get_property(EXTERNAL_LIBS_FROM_PROJECT GLOBAL PROPERTY EXTERNAL_LIBS_FROM_PROJECT)
 
 # ADDING the other important component of normal build INTERN_SRC should nename NORMAL_SRC, but we cant "copy" lib in cmake
-message("\n\n Internal sources linked with: EXT_SRC ${EXTERNAL_LIBS_FROM_PROJECT} ${LIB_FROM_SYSTEM}")
+message("\n\nInternal sources linked with: EXT_SRC ${EXTERNAL_LIBS_FROM_PROJECT} ${LIB_FROM_SYSTEM}")
 target_link_libraries( INTERN_SRC PUBLIC EXT_SRC ${EXTERNAL_LIBS_FROM_PROJECT} ${LIB_FROM_SYSTEM} )
 
 # Here if user want to install shared but we used static as backend, we need to recreate the lib in missing mode

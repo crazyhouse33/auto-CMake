@@ -1,7 +1,7 @@
 #putting test in bin/test
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin/test)
 
-message("Tests exe discovery:\n")
+message("\nTests exe discovery:\n")
 file(GLOB_RECURSE TESTS CONFIGURE_DEPENDS *.c)
 foreach(file ${TESTS})
   message ("\t${file} detected as a test to compile")

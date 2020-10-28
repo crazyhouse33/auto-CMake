@@ -27,7 +27,9 @@ ENDMACRO()
 # Append/return non hidden subdirectories and dir to out
 MACRO(get_non_hidden_subdirectories directory out)
 SUBDIRLIST(subdirs ${directory})
+
 list (APPEND ${out} ${directory})
+
 get_filename_component(absdirectory ${directory} REALPATH )
 FOREACH(sub ${subdirs})
 	string(REPLACE ${absdirectory} "" relative ${sub}) #Here lie the trick to not include .git and other bullshit
@@ -38,6 +40,7 @@ ENDFOREACH()
 ENDMACRO(get_non_hidden_subdirectories)
 
 MACRO(get_include_dirs dir out)
+
 get_non_hidden_subdirectories( ${dir} ${out})
 #Filter thoses that dont contain any .h
 

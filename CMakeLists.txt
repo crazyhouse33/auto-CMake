@@ -60,9 +60,19 @@ endif()
 cmake_minimum_required(VERSION 3.7)
 
 #Common use functions
-include(build-helpers/cmakefunc)
+include(build-helpers/cmakefunc) # Intense globbing functions
+include(build-helpers/cmake_dependencies_set_up) # Getting external libs func
+include(build-helpers/cmake_git) # Retrieving BRANCH_NAME
+
 
 #MODIFY THESES---------------------------------------------------
+if(${BRANCH_NAME} MATCHES  dev|totobranch)
+	message ("Skipping test build") 
+	set (BUILD_TESTING OFF)
+else()
+	set (BUILD_TESTING ON)
+
+endif()
 
 project(ull C )
 set_if_not_set(PROJECT_NAME ULL)
@@ -77,12 +87,13 @@ set_if_not_set (INTERAL_LIBS_MODE SHARED)
 
 # Control external lib dependencies from the system. Dont remove theses lines subcmakes need them
 set_if_not_set(LIB_FROM_SYSTEM  "")
-set_if_not_set(LIB_FROM_SYSTEM_TEST "")
+set_if_not_set(LIB_FROM_SYSTEM_TEST "openmp")
 
 #STOP-MODIFY----------------------------------------------------------
 
 set_if_not_set (SOURCELIBDIR ${CMAKE_BINARY_DIR}/backend_libs)
 set_if_not_set (DATA_TEST_DIR ${CMAKE_SOURCE_DIR}/test/data) 
+
 
 
 #Setting compilation options
@@ -95,10 +106,13 @@ add_definitions("-D${PROJECT_NAME}_VERSION=${version}")
 set_property(GLOBAL PROPERTY EXTERNAL_LIBS_FROM_PROJECT)
 set_property(GLOBAL PROPERTY EXTERNAL_LIBS_TEST_FROM_PROJECT)
 
+set_property(GLOBAL PROPERTY LIB_FROM_SYSTEM_TEST ${LIB_FROM_SYSTEM_TEST})
+message("test=${LIB_FROM_SYSTEM_TEST}")
+set_property(GLOBAL PROPERTY LIB_FROM_SYSTEM ${LIB_FROM_SYSTEM})
 
 
 
-# Configure asked stuff
+# Configure 
 add_subdirectory(build-helpers/configure)
 #if we are not in master, we need to us templates to fill some files for master
 
@@ -121,9 +135,8 @@ add_subdirectory(code)
 
 ##### TEST 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
-
-set(VALGRIND_COMMAND_OPTIONS "--error-exitcode=100")
 include (CTest)
+set(VALGRIND_COMMAND_OPTIONS "--error-exitcode=100")
 
 #Getting shared source for tests in a lib
 add_subdirectory(test)
