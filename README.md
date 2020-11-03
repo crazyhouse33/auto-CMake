@@ -1,65 +1,59 @@
-# Authbreak 
-Generic authentification system injection point based tester for Linux.
+# Auto-CMake 
+My Cmake based build system. 
 
+This is my personnal build system that I wrote and tested quickely, and some features not used nor tested may be broken. It does the work for me.
 
-# Function and motivation
-Authbreak is a tool built to execute attacks that can work on every system, with the same simple and powerful user interface.
+# Goal
+Facilitate start of C projects by exposing cmake functionnalities by file system interface
 
-In this version, it does:
-
-1. guessing
-
-See the todo sections to see what's comming next
-
-
-
-# Install
-
-```bash
-git clone --recursive https://github.com/crazyhouse33/authbreak
-cd authbreak/build
-cmake ..
-# Add -DCMAKE_INSTALL_PREFIX:PATH=/path/to/install to the last command to install in another directory than your system default executable location (need root)
- cmake --build . target install 
-```
-
-Obvisouly you can also just build the binary which end up in the bin dir:
-```bash
-cmake --build . target authbreak, 
-```
-
+# Collateral Features
+Provide Monkey patching in tests (Just define function with same name)
+Reduce executable size (By intensive use of libraries)
+Add test targets (Memory check, build only tests...)
+Separate the test build from the normal one
 
 # Usage
+Clone the repo, read this doc, replace/removes existing files. (Dont forget to empty build-helper/configure/root)
 
-The philosophy is to provide a command with some configurable injection points along with boolean combination of some target execution metrics (time, stdout...) to allow differentiation of success and failures. The different attacks backends use what you specified to generate their attacks in the most efficient way they can. They are run in order of efficiency, and can back off if they detetect there method is not working, until it falls down to brutforce. 
+The interface is mainely file system based. Thoses interaction will be explained. The other things you may want to touch are concentred in the main Cmake in a delimited zone
 
-authbreak -h for a complete explanation of how this version works.
-
-# Effort
-## Perf
-The tool had been written in C to allow for low level optimization. The build system keep tracks of perfs at every commits to detect regressions using kvhf on a local branch
+The extern folder is supposed to contain externals projects. The one in test will only be accessible for tests. The ones in lib are not automatically added in the source, and you need to recolt the lib you need by manually seting it up in the cmake 
 
 
-# Coming
+## Instalable software
+Any \*.c files in code/entry are interpreted as entry point module, and should define main functions. The headers and sources in both extern/normal/src and code/src will be accessibles, as the lirary from the systems specified by the variable LIB\_FROM\_SYSTEM
 
-The next upcoming versions will focus on improving the guessing phase and the interface. Notally, I want to integrate the two following classifiers:
-1. The target process got a prompt
-2. Regexp against output
+The libraries that you manually CMake-setted-up and recolted to the exposed function (see example) in extern/normal/lib will also be linked against.
+
+## Tests
+Any \*.c files in test/entry are interpreted as an entry point module, and will be integred in the test suit. The previously mentioned libraries and sources are accessible. Moreover, you can use there any code in test/src, extern/test/src. The LIB\_FROM\_SYSTEM\_TEST and extern/test/lib function in the same way
+
+The test are executed in the /test/data dir. Functions redefinied in test overide the ones from the normal build
+
+## Configuration
+The cmake configuration feature can be used trought the build-helper/configure/root mirror. Any "To be configured by CMake" will be configured in the mirrored path relative to the CMake source dir.
 
 
-I want the user to be able to control the equilibrium between speed and furtivity when there is a trade off (should the attacks generate some kind of random padding if they are only intersted into the tail?...).  In this logic I want to implement another cartesian product for the guessing that will be really harder to detect and stop.
+# Got you
+You need to manage the targets dependencies that cannot be inferred magically. For exemple if a test execute another test, you should add in one of the test cmake the good add\_dependencies calls
 
-Then I want to add following points:
+You need to prevent some name collisions. Every entry point should have a different name
 
-1. Automatic timing attack (Direct comparision attack, Generic statistical good guess detector, radix tree enumeration, binary tree enumeration?)
-2. Big and small performance improvement (use a thread to categorize the previous output and prepare the next while the current one is running, collect only metrics useful to the used classifiers, cache the loading (idk how yet) of the targeted process)
-5. More control over what's done (pass some attacks )
-6. For the file template, filter the guesses to match given charset and len
-7. Make it cross platform 
+# Not tested
+The project is not tested as much as it should, because it is particulary annoying to set up entires C tests projects. 
 
-# Repo
+## Needed
+I had the need once to compile an executable that would be used by the tests but that should not be used directly in the test suit. So that's were you put those. They can access the same code base as the regular test ones
 
-Each version of authbreak is a commit in the master branch. The version changelog is the git log of master branch. 
+## Install lib
+The normal project can be instalable as a library, if you set one of the variables to the name of the resulting library:
+INSTALL\_SOURCES\_AS\_STATIC\_LIB 
+INSTALL\_SOURCES\_AS\_SHARED\_LIB 
 
-The dev branch contains additional continuous integration files, and has a usual git messy history :)
+# TODO
+Replace macros by function + set parent scope
+Finish the test target so it run modified/previously failed tests only
+Integrate every usefull I will encounter the need for at some points (usefull code definition)
+
+
 

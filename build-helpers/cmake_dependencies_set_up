@@ -1,5 +1,0 @@
-MACRO(find_libraries libs)
-FOREACH(lib ${libs})
-find_library( ${lib} {lib} REQUIRED)
-ENDFOREACH()
-ENDMACRO(find_libraries)

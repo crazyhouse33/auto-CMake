@@ -9,7 +9,7 @@ if (GIT_FOUND)
 )
 
 	if(${git_res} EQUAL 0)
-		message("\tDetected branch name: ${out}")
+		message("\tDetected branch name: ${BRANCH_NAME}")
 	else()
 		message("Could not detect branch name. Is the project versionned?")
 		unset (BRANCH_NAME)

@@ -5,6 +5,7 @@
 #include "ext_src.h"
 #include "ext_lib.h"
 #include "int_src.h"
+#include <stdio.h>
 
 //testing the monkey pathching of internal sources  (int_src just crash normally)
 //TODO it would be good to test the monkey patching of everything, but I am lazy
@@ -36,5 +37,6 @@ int main(){
 	ext_test_lib();
 	ext_test_src();
 	int_src();
+	return 0;
 
 }

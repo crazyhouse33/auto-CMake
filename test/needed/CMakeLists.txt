@@ -1,12 +1,15 @@
 #putting test in bin/test
 set(EXECUTABLE_OUTPUT_PATH ${DATA_TEST_DIR})
 
+message("\nExternal executable needed by tests:\n")
+
 #compile ext-test ones, which are just unrelated programs
 file(GLOB_RECURSE TEST_DEPENDENCIES CONFIGURE_DEPENDS *.c)
 foreach(file ${TEST_DEPENDENCIES})
-	message("External executable needed by tests discovery:\n")
+	message(\t${file})
 	get_filename_component (name_without_extension ${file} NAME_WE)
   	add_executable(${name_without_extension} ${file})
+	target_link_libraries(${name_without_extension} TEST_INTERN_SRC INTERN_SRC)
 endforeach()
 
 #listing dependencies of test 

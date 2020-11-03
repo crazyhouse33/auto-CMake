@@ -10,7 +10,7 @@ add_subdirectory(entry)
 add_subdirectory(needed)
 
 #Adittional usefull test targets
-include(${CMAKE_SOURCE_DIR}/build-helpers/cmake_lazy_testing_targets) # need to be after test discovery
+include(${CMAKE_SOURCE_DIR}/build-helpers/cmake_lazy_testing_targets.cmake) # need to be after test discovery
 
 
 

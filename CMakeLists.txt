@@ -34,7 +34,7 @@ endif()
 	# Each test/*.c (Not in a special folder) is a test executable linked against TEST_INTERN_SRC INTERN_SRC EXT_SRC EXT_TEST_SRC
 
 #CREATING LIB
-	#INSTALL_SOURCES_AS_SHARED(STATIC)_LIB cariable, if set, this will include your sources in the instalable stuff as a library(make install)
+	#INSTALL_SOURCES_AS_SHARED(STATIC)_LIB variable, if set, this will include your sources in the instalable stuff as a library(make install)
 
 
 #MANUAL CMAKE CHANGE NEEDED
@@ -54,15 +54,15 @@ endif()
 
 	# CONFIGURE FILES
 	
-	# Go into build-helper/configure/root-mirror. Any file here is going to be configured by Cmake and the result stored in the root folder of the project
+	# Go into build-helper/configure/root. Any file here is going to be configured by Cmake and the result stored in the root folder of the project
 
 
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.9)
 
 #Common use functions
-include(build-helpers/cmakefunc) # Intense globbing functions
-include(build-helpers/cmake_dependencies_set_up) # Getting external libs func
-include(build-helpers/cmake_git) # Retrieving BRANCH_NAME
+include(build-helpers/cmakefunc.cmake) # Intense globbing functions
+include(build-helpers/cmake_dependencies_set_up.cmake) # Getting external libs func
+include(build-helpers/cmake_git.cmake) # Retrieving BRANCH_NAME
 
 
 #MODIFY THESES---------------------------------------------------
@@ -87,7 +87,7 @@ set_if_not_set (INTERAL_LIBS_MODE SHARED)
 
 # Control external lib dependencies from the system. Dont remove theses lines subcmakes need them
 set_if_not_set(LIB_FROM_SYSTEM  "")
-set_if_not_set(LIB_FROM_SYSTEM_TEST "openmp")
+set_if_not_set(LIB_FROM_SYSTEM_TEST "omptatattata;OpenMP")
 
 #STOP-MODIFY----------------------------------------------------------
 
@@ -107,7 +107,6 @@ set_property(GLOBAL PROPERTY EXTERNAL_LIBS_FROM_PROJECT)
 set_property(GLOBAL PROPERTY EXTERNAL_LIBS_TEST_FROM_PROJECT)
 
 set_property(GLOBAL PROPERTY LIB_FROM_SYSTEM_TEST ${LIB_FROM_SYSTEM_TEST})
-message("test=${LIB_FROM_SYSTEM_TEST}")
 set_property(GLOBAL PROPERTY LIB_FROM_SYSTEM ${LIB_FROM_SYSTEM})
 
 
