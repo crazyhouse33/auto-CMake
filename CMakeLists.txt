@@ -10,15 +10,6 @@ if ( ${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR} )
 endif()
 
 
-# THIS is an attempt to use for me the same cmake structure all the time. 
-# NOTHING IS TESTED. MOREOVER, there are lot of mechanism that I coded once, never used, and that are probably broken 
-
-# This makefile use various autodetection techniques by creating libraries for each autodetected source group and linking what need to be linked afterward
-# This allow:
-# 1.Monkeypatching, redefine a function in your tests, it will patch the old one in your sources
-# 2. Minimal executable size
-# 3. Clean separation of test and production code
-# 4. Autodetecting 
 
 # AUTODETECTED Sources:
 # code/src is for internal source lib -> INTERN_SRC
@@ -37,26 +28,6 @@ endif()
 	#INSTALL_SOURCES_AS_SHARED(STATIC)_LIB variable, if set, this will include your sources in the instalable stuff as a library(make install)
 
 
-#MANUAL CMAKE CHANGE NEEDED
-
-	# The variables you need to change are all in the block under cmake_minimum_required in this file
-	# This whole project does not act on dependencies. For exemple you may need to add that one of your test depend on an external one. See example in test/ext-tests 
-	
-	
-	# GETTING LIBS FROM SYSTEM / EXTERNAL PROJECT
-
-
-	# This is controlled by the two vars NEEDED_EXTERNAL_LIBS. Eeach of the speficied libraries will be looked first in the cmakelist in extern/normal(or test)/lib. If not found, it will be looked in the system installed libraries
-	
-	# ADDITIONALS TARGETS
-	
-	# This makefile also define usefull test(Memory test, build only tests...) and benchmark related target You will have to adapt the benchmark one to your use-case in order for the target to work 
-
-	# CONFIGURE FILES
-	
-	# Go into build-helper/configure/root. Any file here is going to be configured by Cmake and the result stored in the root folder of the project
-
-
 cmake_minimum_required(VERSION 3.9)
 
 #Common use functions
@@ -71,6 +42,7 @@ if(${BRANCH_NAME} MATCHES  dev|totobranch)
 	set (BUILD_TESTING OFF)
 else()
 	set (BUILD_TESTING ON)
+	set (CMAKE_BUILD_TYPE Debug) 
 
 endif()
 
@@ -85,7 +57,7 @@ set_if_not_set (INTERAL_LIBS_MODE SHARED)
 #set_if_not_set (INSTALL_SOURCES_AS_STATIC_LIB my_static_lib_name)
 #set_if_not_set (INSTALL_SOURCES_AS_SHARED_LIB my_shared_lib_name)
 
-# Control external lib dependencies from the system. Dont remove theses lines subcmakes need them
+# Control external lib dependencies from the system. 
 set_if_not_set(LIB_FROM_SYSTEM  "")
 set_if_not_set(LIB_FROM_SYSTEM_TEST "omptatattata;OpenMP")
 

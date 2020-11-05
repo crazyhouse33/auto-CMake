@@ -1,5 +1,5 @@
 #putting test in bin/test
-set(EXECUTABLE_OUTPUT_PATH ${DATA_TEST_DIR})
+set(EXECUTABLE_OUTPUT_PATH ${DATA_TEST_DIR}/bin)
 
 message("\nExternal executable needed by tests:\n")
 

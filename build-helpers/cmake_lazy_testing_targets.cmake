@@ -2,8 +2,18 @@
 # 1-Lazy recompile before testing.
 # 2-Lazy testing (run only failed previous failed test or changed test / code depency)
 # If you have a large test suite, this target will save you a crazy amount of time 
+SET(Python_ADDITIONAL_VERSIONS 3 3.6 3.5 3.4 3.3 3.2 3.1 3.0)
+find_package(PythonInterp) # The building process use python to provide lazy-testing
 
 if (PYTHONINTERP_FOUND)
+
+add_custom_target(lazy-test
+                  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/build-helpers/lazy-test-cache.py --lazy ${list_lazy_tests} --mandatory ${list_mandatory_tests} --ctestPath ${CMAKE_CTEST_COMMAND} --cmakePath ${CMAKE_COMMAND}                  WORKING_DIRECTORY ${CMAKE_BINARY_DIR} 
+		  COMMENT "Recompile modified dependency of project run the test that changed since since lastlazy/full/all test and the ones that failed previously"
+		  VERBATIM
+                  USES_TERMINAL
+)
+endif()
 
 # Make make test also create a timestamp
 
@@ -20,13 +30,6 @@ add_custom_target(build-tests
 	COMMENT "Compile all tests"
 )
 
-
-add_custom_target(lazy-test
-                  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/build-helpers/lazy-test-cache.py --lazy ${list_lazy_tests} --mandatory ${list_mandatory_tests} --ctestPath ${CMAKE_CTEST_COMMAND} --cmakePath ${CMAKE_COMMAND}                  WORKING_DIRECTORY ${CMAKE_BINARY_DIR} 
-		  COMMENT "Recompile modified dependency of project run the test that changed since since lastlazy/full/all test and the ones that failed previously"
-		  VERBATIM
-                  USES_TERMINAL
-                  )
 
 # This one test the full build process including the generator, and memory checks
 add_custom_target(full-test
@@ -100,4 +103,3 @@ add_dependencies(all-test build-tests ) #forcing re compilation before tests
 add_dependencies(mem-test build-tests ) #forcing re compilation before tests
 
 
-endif()

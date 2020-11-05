@@ -10,7 +10,6 @@
 int main(){
 	ext_src();
 	ext_lib();
-	int_src();
 
 	shared_test();
 	ext_test_lib();
