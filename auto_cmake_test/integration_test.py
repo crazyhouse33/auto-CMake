@@ -25,7 +25,7 @@ working_configurations =['', '-DINTERAL_LIBS_MODE=STATIC',
 
         ]
 
-working_targets = ['all', 'mem-test']
+working_targets = ['all', 'mem-test',"perf-collect-all"]
 
 def test_integration():
 

@@ -1,8 +1,9 @@
-# Detect exe to compile/link/install 
-add_subdirectory(entry)
+# Instalable targets and normal procedur eper entries
+init_ring(code YES)
 
-# Compiling internal source / install it as a lib if option given
 add_subdirectory(src)
+
+add_subdirectory(entry)
 
 
 

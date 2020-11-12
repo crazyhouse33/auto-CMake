@@ -29,12 +29,12 @@ FOREACH(lib ${libs})
 	message("\n\t${lib}:\n")
 	find_package(${lib} QUIET )
 	if(NOT ${lib}_FOUND)
-		find_library( ${lib} ${lib} )
+		find_library( ${lib} ${lib} PATH_SUFFIXES ${lib})
 		if (${${lib}} STREQUAL "${lib}-NOTFOUND")
 			message("\t\tWARNING: Not found, wont be linked against")
 		else()
 			message("\t\t Library found")
-			LIST(APPEND ${res} ${lib})
+			LIST(APPEND ${res} ${${lib}})
 		endif()
 		#Cleaning state
 	else()#Package found
@@ -44,12 +44,10 @@ FOREACH(lib ${libs})
 		unset(tmp)
 	endif()
 ENDFOREACH()
-ENDMACRO(find_libraries)
+ENDMACRO(find_libraries ring_name)
 
-# Add here libs you want to use and cant be obtained the simple way
+# Add here libs you want to use and cant be obtained the simple way because the convention are to wierds, you have a name collision...
 MACRO(my_manual_find_libs)
 ENDMACRO()
 
-MACRO(my_manual_find_libs_test)
-ENDMACRO()
 

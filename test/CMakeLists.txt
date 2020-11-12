@@ -1,4 +1,5 @@
-message ("\n--------TEST build--------\n")
+# entries are not instalable
+init_ring(test NO)
 
 # Compile test internal lib and link to external 
 add_subdirectory(src)

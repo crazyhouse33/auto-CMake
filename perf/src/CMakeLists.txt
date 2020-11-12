@@ -1,3 +1,1 @@
 ring_core()
-
-

@@ -2,6 +2,6 @@ set(SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/ext_lib.c ${CMAKE_CURRENT_SOURCE_DIR}/in
 
 set(ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-add_library(eprof STATIC ${SOURCES})
+add_library(ext_lib_normal STATIC ${SOURCES})
 
-target_include_directories(eprof PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/includes)
+target_include_directories(ext_lib_normal PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/includes)

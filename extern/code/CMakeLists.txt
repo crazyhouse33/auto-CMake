@@ -1,4 +1,4 @@
-# Recolt sources
+# Collect sources
 add_subdirectory(src)
 
 # Setup some external libs

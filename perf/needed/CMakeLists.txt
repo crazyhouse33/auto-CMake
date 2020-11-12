@@ -1,5 +1,7 @@
 #putting test in bin/test
-ring_entries("External executables for tests" ${DATA_TEST_DIR}/bin)
+ring_entries("External executables for perfs" ${DATA_PERF_DIR}/bin)
+
+
 
 #listing dependencies of test 
 #add_dependencies(executor child-buf-controle)
