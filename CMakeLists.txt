@@ -11,22 +11,6 @@ endif()
 
 
 
-# AUTODETECTED Sources:
-# code/src is for internal source lib -> INTERN_SRC
-# test/src is sources shared by all tests -> TEST_INTERN_SRC
-# extern/normal/src is to get sources of externals projects -> EXT_SRC
-# extern/test/src is the same but will be used only by tests -> EXT_TEST_SRC
-# test/needed/*.c refer to external executable to compile needed by test and dont use sources
-
-# What are the produced lib and exec?
-
-#CREATING EXE
-	# Every code/entry/*.c is an instalable executable linked against INTERN_SRC PUBLISHED_INTERL_SRC EXT_SRC
-	# Each test/*.c (Not in a special folder) is a test executable linked against TEST_INTERN_SRC INTERN_SRC EXT_SRC EXT_TEST_SRC
-
-#CREATING LIB
-	#INSTALL_SOURCES_AS_SHARED(STATIC)_LIB variable, if set, this will include your sources in the instalable stuff as a library(make install)
-
 
 cmake_minimum_required(VERSION 3.9)
 
@@ -39,6 +23,7 @@ include(build-helpers/rings.cmake) # ring stuff
 
 # Set global variables
 include(build-helpers/cmake_git.cmake) # Retrieving BRANCH_NAME
+
 
 #MODIFY THESES---------------------------------------------------
 if(${BRANCH_NAME} MATCHES  dev|totobranch)
@@ -62,9 +47,10 @@ set_if_not_set (INTERNAL_LIBS_MODE SHARED)
 #set_if_not_set (INTERNAL_LIBS_MODE_test STATIC)
 #set_if_not_set (INTERNAL_LIBS_MODE_perf STATIC)
 
-# Uncomment one or both of thoses line to install the code ring
-#set_if_not_set (INSTALL_CODE_AS_STATIC_LIB my_static_lib_name)
-#set_if_not_set (INSTALL_CODE_AS_SHARED_LIB my_shared_lib_name)
+# Uncomment one or both of thoses line to install coresspondings ring on the system. These will expose the lib in the same mode (STATIC/SHARED) as it was used with the previous variable
+#set_if_not_set (INSTALL_LIB_code my_lib_name) 
+#set_if_not_set (INSTALL_LIB_test my_lib_name)
+#set_if_not_set (INSTALL_LIB_perf my_lib_name)
 
 # Control external lib dependencies from the system. 
 set_if_not_set(LIB_FROM_SYSTEM_code "")
@@ -80,6 +66,8 @@ set_if_not_set(SOURCE_EXTENSIONS "c")
 
 #STOP-MODIFY----------------------------------------------------------
 
+# Need to include after project call
+include(GNUInstallDirs) #system headers place
 set_if_not_set (SOURCELIBDIR ${CMAKE_BINARY_DIR}/backend_libs)
 set_if_not_set (DATA_TEST_DIR ${CMAKE_SOURCE_DIR}/test/data) 
 set_if_not_set (DATA_PERF_DIR ${CMAKE_SOURCE_DIR}/perf/data) 
@@ -103,18 +91,8 @@ set_property(GLOBAL PROPERTY LIB_FROM_SYSTEM_perf ${LIB_FROM_SYSTEM_perf})
 add_subdirectory(build-helpers/configure)
 #if we are not in master, we need to us templates to fill some files for master
 
-
-# Getting external projects sources in another lib
-#add_subdirectory(extern)
-
-
-# Including other libs
-#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/normal/lib/eprof/libs/C)
-
 # Building main executable if there is and getting all src in a library
 add_subdirectory(code)
-
-
 
 
 ##### TEST 

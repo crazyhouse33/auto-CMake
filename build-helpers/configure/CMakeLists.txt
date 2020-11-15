@@ -1,5 +1,5 @@
 # Configuring files as if it was the root directory
-message ("\nConfiguring files in ${CMAKE_CURRENT_SOURCE_DIR}:\n")
+message ("\nConfiguring files:\n")
 file (GLOB_RECURSE ALL_FILES LIST_DIRECTORIES FALSE RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/root" "root/*" )
 FOREACH( SUB_FILE ${ALL_FILES})
 	message("\t${SUB_FILE}")

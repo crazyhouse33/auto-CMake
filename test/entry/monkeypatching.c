@@ -1,6 +1,6 @@
 #include "shared_test.h"
-#include "ext_test_src.h"
 #include "ext_test_lib.h"
+#include "munit.h"//This is to test that we access ext_test_src part of test ring
 
 #include "ext_src.h"
 #include "ext_lib.h"
@@ -35,7 +35,7 @@ int main(){
 	
 	shared_test();
 	ext_test_lib();
-	ext_test_src();
+	munit_assert_true(1);
 	int_src();
 	return 0;
 

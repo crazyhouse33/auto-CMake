@@ -16,8 +16,6 @@ FUNCTION(ring_core)
 	add_subdirectory(${CMAKE_SOURCE_DIR}/extern/${ring_name} ${CMAKE_CURRENT_BINARY_DIR}/extern/${ring_name})
 
 	#1 Finding external libs
-	set(ARCHIVE_OUTPUT_DIRECTORY ${SOURCELIBDIR})
-	# Finding Externals libs
 	get_property(LIB_FROM_SYSTEM GLOBAL PROPERTY "LIB_FROM_SYSTEM_${ring_name}")
 
 	if (LIB_FROM_SYSTEM)
@@ -28,23 +26,32 @@ FUNCTION(ring_core)
 
 	#2 Getting lib from the intern ring
 	message("\nInternal sources\n")
-	dir_to_lib(${libmod} ${CMAKE_CURRENT_SOURCE_DIR} INTERN_${ring_name})
+
+	# Finding Externals libs
+	set (target_name RING_${ring_name})
+	dir_to_lib(${libmod} ${CMAKE_CURRENT_SOURCE_DIR} ${target_name})
 
 
 	#3 Getting external libs from the ring
 	get_property(EXTERNAL_LIBS_FROM_PROJECT GLOBAL PROPERTY EXTERNAL_LIBS_FROM_PROJECT_${ring_name})
 
-	#4 Get previous rings
-	get_property(RINGS_CHAIN GLOBAL PROPERTY RINGS_CHAIN)
 
-	set(to_link EXT_SRC_${ring_name} ${FOUNDED_LIBS} ${EXTERNAL_LIBS_FROM_PROJECT})
+	set(to_link EXT_SRC_${ring_name} ${EXTERNAL_LIBS_FROM_PROJECT} ${FOUNDED_LIBS})
 
 	message("\nLinked with: ${to_link}")
-	target_link_libraries( INTERN_${ring_name} PUBLIC ${to_link} )
+	target_link_libraries( ${target_name} PUBLIC ${to_link} )
+
+	#4 Install the ring if asked
+	if (DEFINED INSTALL_LIB_${ring_name})
+		set(lib_name ${INSTALL_LIB_${ring_name})
+		set_target_properties(${target_name} PROPERTIES OUTPUT_NAME ${lib_name})
+		INSTALL(TARGETS ${target_name} DESTINATION lib/${lib_name} PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${lib_name}")
+	endif()
 
 
 	#5 appending ring to the chain
-	list (PREPEND RINGS_CHAIN INTERN_${ring_name})
+	get_property(RINGS_CHAIN GLOBAL PROPERTY RINGS_CHAIN)
+	list (PREPEND RINGS_CHAIN ${target_name})
 	set_property(GLOBAL PROPERTY RINGS_CHAIN ${RINGS_CHAIN} )
 ENDFUNCTION()
 
@@ -83,10 +90,11 @@ ENDFUNCTION()
 
 FUNCTION(ring_entries description)
 	set (dest ${PROJECT_SOURCE_DIR}/bin/${ring_name})
-	if (${ARGN})
-		set(dest ${ARGN0})
+	if (ARGN)
+		list(GET ARGN 0 dest)
 	endif()
-	set(EXECUTABLE_OUTPUT_PATH  ${dest})
+
+	set(EXECUTABLE_OUTPUT_PATH ${dest})
 
 	#compile ext-test ones, which are just unrelated programs
 	file(GLOB_RECURSE entries CONFIGURE_DEPENDS *.c)

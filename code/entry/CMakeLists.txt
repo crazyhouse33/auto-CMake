@@ -1,4 +1,4 @@
-ring_entries("Main executables")
+ring_entries("Main executables" ${PROJECT_SOURCE_DIR}/bin)
 
 
 

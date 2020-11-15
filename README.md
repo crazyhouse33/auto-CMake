@@ -70,9 +70,9 @@ Any \*.c files in perf/entry are interpreted as a perfomance collecter.
 
 The perf executables are run in /perf/data.
 
-Some targets are added to create graphs.
+Auto-cmake comes with my default block-profiling framework, but it try to get it from the system (I did not include it in source because you need a python executable anyway). You can either install it (https://github.com/crazyhouse33/eprof), or use another one. In the latter case you need to modify the perf/entry CMakeList properly so the perfs-targets works.
 
-Auto-cmake comes with my default block-profiling framework, but it try to get it in the system. You can either install it(https://github.com/crazyhouse33/eprof), or use another one.
+Additionally, you can setup some variables in the perf/entry CMakeList to control the intercations with the profiler.
 
 
 ## Configuration
@@ -85,9 +85,11 @@ The project is not tested as well as it should, because it is particulary annoyi
 The repertory work like the normal test entry. However, the resulted executable wont be run in a test-suit. This is needed when you need to compile an executable for one of your test to run on. **Dont forget to add the dependency**
 
 ## Install lib
-The code ring can be instalable as a library, if you set one of the variables to the name of the resulting library:
-1. INSTALL\_SOURCES\_AS\_STATIC\_LIB 
-1. INSTALL\_SOURCES\_AS\_SHARED\_LIB 
+The rings can be instalable as libraries, if you set the variables to the name of the resulting library:
+1. "INSTALL\_LIB\_code toto" to install the code ring as the toto library 
+
+## Static or Shared Rings
+Code in rings can be statically or dynamcally included in entries. Set the INTERNAL\_LIBS\_MODE\_test STATIC/SHARED to control the test ring for example.
 
 ## Cutting rings
 You can add a new ring that wont access the previous ones. See the set\_rings in build-helper/rings.cmake
@@ -96,7 +98,7 @@ You can add a new ring that wont access the previous ones. See the set\_rings in
 The dev folder contain my githook based local continious integration tool. If you share the hooks with the script in .git-hooks, the scripts will be firing at specified events.
 
 # Got you
-2. You need to prevent CMake targets name collision. This mean for exemple that entries should have a different names, even across rings
+2. You need to prevent CMake targets name collision. This mean for exemple that entries should have a different names, even across rings, but also that you cant use allready automatically defined targets. In particular, dont name an entry test.c, or you will run into really wierd bugs.
 
 
 # TODO
