@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 
-# This python script expect a list of lazy and mandatory executable as argument. Then it try to rebuild the associated target. If the executable changed, it run it. If the test was reported as fail in previous session, it run it as well
+# This python script expect a list of lazy and mandatory executable as argument. Then it try to rebuild the associated target. If the executable changed, it run it. I fought CMake A LOT to try to get a full CMake solution. But it always had drawbacks https://discourse.cmake.org/t/why-fixtures-are-forced-to-be-tests/2194/6. If I do unrelated targets calling CTest, I must call ctest on all of them one by one, which could have drawback if I start using the dashboard features and other stup
 
 import sys
 import os.path
+from pathlib import Path
 import re
 import subprocess
 import argparse
@@ -18,7 +19,6 @@ parser = argparse.ArgumentParser(description="""Run a lazy test session. Your bu
         """)
 
 parser.add_argument('--ctest-string','-o', help='Options to transmit to Ctest, ex: "--build-and-test --generator \"Unix Makefile\"", dont forget to quote!', default="")
-parser.add_argument('--mandatory','-m', nargs='*', help="List of mandatory test in form: \"TARGET PATH\". Target is the name of the build target, path is the executable test")
 parser.add_argument('--lazy','-l', nargs='*', help="List of lazy test, same form as mandatory")
 parser.add_argument('--ctestPath','-p', default="ctest",help="The path of ctest on the platform, default is \"ctest\"")
 parser.add_argument('--cmakePath','-P', default="cmake",help="The path of cmake on the platform, default is \"cmake\"")
@@ -28,51 +28,76 @@ parser.add_argument('--no-build', action='store_true',help="Dont rebuild tests")
 args= parser.parse_args()
 
 def runTarget(target):
-    print ("Running Target: " +target)
+    print ("Building Target: " +target)
     subprocess.call([args.cmakePath, "--build", ".", "--target", target])
 
 
-def fullTestAllreadyRan():
-    return os.path.isfile("ts-since-full-test")
-
-def run(toRun):
-    """Run a list of target with cmake and given options"""
+def run(toRun, options):
+    """Run a list of test with and given options"""
     ctestSelect= "(" + "|".join(toRun) +')'
     
-    print ("Test command: "+ args.ctestPath +' -R '+ ctestSelect)
-    subprocess.call ([args.ctestPath, '-R', ctestSelect])
+    print ("Test command: "+ args.ctestPath +' -R '+ ctestSelect + " " + options)
+    subprocess.call ([args.ctestPath, '-R', ctestSelect, options])
 
-def failedPastTest(target):
-    """Parse ctest report to see if is in the failed file (figthing against cmake once again) """
+def last_test_failed():
+    """Parse ctest report to return the target that failed last time run """
     with open("Testing/Temporary/LastTestsFailed.log") as f:
         wholeFile= f.read()
-    return re.search(r'^\d:'+ target+'\S*$', wholeFile)
+    return re.search(r'^\d:(.*)\S*$', wholeFile).groups
 
 
 def isToRun(target, executable):
     """ Executable is to be retested if he is younger than last test, or if he failed last test"""
     return failedPastTest(target) or os.path.getmtime(executable) < lastTest
 
+def get_success_file(target):
+    return target+"_succeed.marker"
+
+def mark_sucess(target):
+    """Mark a target as succeed"""
+    Path(get_success_file(target)).touch()
+
+def is_marked(target):
+    return os.path.isfile(get_success_file(target))
+
+def get_outdated(target_list, executable_list, executable_old_dates):
+    """Return out_dated targets, according to path of associed executable and old dates"""
+    out_dated=[]
+    lazy_exe_date=[os.path.getmtime(path) for path in lazy_exe]
+    for i, executable in enumerate(target_list):
+        if os.path.getmtime(executable) > lazy_exe_date[i]: #Outdated
+            out_dated+= lazy_targets[i]
+    return out_dated
+
+def deal_with_targets(target_list):
+    """Lazy test a group of targets"""
+    # Getting the one that did not pass yet
+    target_list = [ target for target in target_list if tar
+
+    # Running the tests
+    run(target_list)
+
+    # Marking the ones passing
+    passing = [ target for target in target_list if target not in last_test_failed()]
+    for target in passing:
+        mark_sucess(target)
+
+
+lazy_targets=[x[0] for x in args.lazy]
+lazy_exe= [x[1] for x in args.lazy]
+
+lazy_exe_date=[os.path.getmtime(path) for path in lazy_exe]
+
 
 if not args.no_build:
-    runTarget("build-tests")
-
-#TODO make test create a dependencie
-if not fullTestAllreadyRan():
-    print ("\nThe full test have never been run!\n")
-    runTarget('all-test')
-    exit(0)
-
-lastTest= os.path.getmtime("ts-since-lazy-test")
+    for target in lazy_targets:
+        runTarget(target)
 
 
-toRun= [ mandatory[0] for mandatory in args.mandatory ]
+out_dateds = get_outdated(lazy_targets, lazy_exe, lazy_exe_date)
+for target in out_dateds:
+    os.remove(get_success_file(target))
 
-for target in args.lazy:
-    target, execPath= target.split(' ',1)
-    if isToRun(target, execPath):
-        toRun.append(target)
 
-run(toRun)
 
 

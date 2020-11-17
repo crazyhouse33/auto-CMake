@@ -42,12 +42,11 @@ FUNCTION(get_entry_target path name)
 		DEPENDS ${kvf_out}
 		WORKING_DIRECTORY ${DATA_PERF_DIR}
 		)
-
 	add_dependencies( perf-collect-all  ${target_recolt} )
-
+	#set (${to_install} ${name} PARENT_SCOPE) # It does not make sense to install perf suit
 ENDFUNCTION()
 
-ring_entries("Performance collecter")
+ring_entries("Performance collecter" ${DATA_PERF_DIR})
 
 # Agregate all the kvf
 add_custom_command(OUTPUT "all.kvf"

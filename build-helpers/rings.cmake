@@ -94,7 +94,7 @@ FUNCTION(ring_entries description)
 		list(GET ARGN 0 dest)
 	endif()
 
-	set(EXECUTABLE_OUTPUT_PATH ${dest})
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${dest})
 
 	#compile ext-test ones, which are just unrelated programs
 	file(GLOB_RECURSE entries CONFIGURE_DEPENDS *.c)
@@ -103,20 +103,20 @@ FUNCTION(ring_entries description)
 	endif()
 	foreach(file ${entries})
 		get_filename_component (name_without_extension ${file} NAME_WE)
-		get_entry_target(${file} ${name_without_extension})
+		get_entry_target(${file} ${name_without_extension} to_install)
 		if(${ring_instalable_entries})
-			INSTALL(TARGETS ${name}
-				RUNTIME DESTINATION ${name} 
+			INSTALL(TARGETS ${to_install}
 				)
 		endif()
 	endforeach()
 ENDFUNCTION()
 
-#DEFAULT get_entry_target overide if you need a different comportement for your ring
-FUNCTION(get_entry_target path name)
+#DEFAULT get_entry_target overide if you need a different comportement for your ring. Use a maccro to benefit from some variables set higher(OUTPUT_DIR...)
+FUNCTION(get_entry_target path name to_install)
 	message("\t${path}")
 	add_executable(${name} ${path})
 	target_link_ring(${name})
+	set (${to_install} ${name} PARENT_SCOPE) 
 
 ENDFUNCTION()
 

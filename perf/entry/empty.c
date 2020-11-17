@@ -10,6 +10,5 @@ int main(){
 	  Eprof* global_profiler = new_eprofiler(EPROF_OUTPUT, true);//EPROF_OUTPUT come from the build system
 	  eprof_event_start(global_profiler, test);
 	  eprof_event_end(global_profiler, test);
-	  int a=18;
 	  return 0;
 }
