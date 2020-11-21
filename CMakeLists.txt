@@ -62,6 +62,13 @@ set_if_not_set(HEADER_EXTENSIONS "h")
 # Set the list of extensions you recognize as source 
 set_if_not_set(SOURCE_EXTENSIONS "c") 
 
+# PERF ring  kvhf related
+
+# Comment to not allow gone keys
+set (perf-allow-gone ON)
+
+# List to name of executable you want to monitor the size in the perfs
+set (perf-exec_to_mesurate_size "exec1;perf-empty")
 
 
 #STOP-MODIFY----------------------------------------------------------

@@ -17,11 +17,20 @@ ENDFUNCTION()
 # Return prefixed version of a list
 FUNCTION(prefix a_list prefix out)
 	FOREACH(item ${a_list})
-		LIST(APPEND ${out} "${prefix}${item}")
+		LIST(APPEND res "${prefix}${item}")
 	ENDFOREACH()
 
-	set (${out} ${${out}} PARENT_SCOPE)
+	set (${out} ${res} PARENT_SCOPE)
 ENDFUNCTION()
+
+# Return prefixed version of a list
+FUNCTION(postfix a_list postfix out)
+	FOREACH(item ${a_list})
+		LIST(APPEND res "${item}${postfix}")
+	ENDFOREACH()
+	set (${out} ${res} PARENT_SCOPE)
+ENDFUNCTION()
+
 
 FUNCTION(find_extension dir extensions out)
 
