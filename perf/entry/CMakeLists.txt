@@ -73,7 +73,7 @@ ENDFOREACH()
 get_property(PERFS-COLLECTERS GLOBAL PROPERTY PERFS-COLLECTERS )
 message ("PERFS=${PERFS-COLLECTERS}")
 # Agregate all the kvf
-add_custom_command(OUTPUT "all.kvf"
+add_custom_command(OUTPUT "${DATA_PERF_DIR}/results/all.kvf"
 	COMMAND ${kvhfutils} kvf -m -o all.kvf
 	WORKING_DIRECTORY ${DATA_PERF_DIR}/results
 	COMMENT "Merging every kvf files into all.kvf"
@@ -81,7 +81,7 @@ add_custom_command(OUTPUT "all.kvf"
 	)
 
 add_custom_target(perf-aggregate
-	DEPENDS "all.kvf")
+	DEPENDS "${DATA_PERF_DIR}/results/all.kvf")
 
 add_custom_target(perf-check-resume
 	COMMAND ${kvhfutils} --required-length 1 --check-file --actualized all.kvf

@@ -1,0 +1,10 @@
+test:31681.0
+-maxs:31681.0
+-mins:31681.0
+-stdevs:0.0
+exec1_size:17696.0
+test2:16164.0
+-maxs:16164.0
+-mins:16164.0
+-stdevs:0.0
+perf-empty_size:37776.0
