@@ -36,16 +36,33 @@ def run(toRun, options):
     
     sub_argv=[args.ctestPath, '-R', ctestSelect] + shlex.split(options) 
     my_print ("Test command:", *sub_argv)
-    subprocess.call (sub_argv)
+    return subprocess.call (sub_argv)
 
-def last_test_failed():
-    """Parse ctest report to return the target that failed last time run """
+def last_test_passing(last_runned,ret):
+    """Parse ctest report to return the target that passed last time run. Ret is the Ctest exit code. last_runned are the last runned tests. Thoses are needed to interpret correctly """
+    # See https://stackoverflow.com/questions/39945858/cmake-testing-causing-error-when-tests-fail
+#enum {
+#  UPDATE_ERRORS    = 0x01,
+#  CONFIGURE_ERRORS = 0x02,
+#  BUILD_ERRORS     = 0x04,
+#  TEST_ERRORS      = 0x08,
+#  MEMORY_ERRORS    = 0x10,
+#  COVERAGE_ERRORS  = 0x20,
+#  SUBMIT_ERRORS    = 0x40
+#};
+    if not(ret==0 or ret & 0x08 or ret & 0x10 or ret & 0x20 or ret & 0x40):# We try to also handle the case where CTest does not respect the enum and crash or whatever)
+        my_print("Lazy test wont mark any target because of this ctest exit status:",ret)
+        return [] # Nothing could have passed.
+
     try:
         with open("Testing/Temporary/LastTestsFailed.log") as f:
             wholeFile= f.read()
-        return re.findall(r'^\d:(.*)\S*$', wholeFile)
+        failing = re.findall(r'^\d:(.*)\S*$', wholeFile)
     except FileNotFoundError:# Ninja dont generate if no fail
-        return []
+        failing=[]
+
+    return [ x for x in last_runned if x not in failing]
+
 
 def get_success_file(target):
     return args.marks_dir+'/'+target+"_succeed.marker"
@@ -68,10 +85,10 @@ def get_non_marked(test_list):
 tests_to_run = get_non_marked(args.tests)
 
 # Running the tests
-run(tests_to_run, args.ctest_options)
+ret=run(tests_to_run, args.ctest_options)
 
 # Marking the ones passing
-passing = [ target for target in tests_to_run if target not in last_test_failed()]
+passing = last_test_passing( tests_to_run, ret)
 for target in passing:
     mark_sucess(target)
 my_print("Marking ass successfull:", *passing)
