@@ -17,7 +17,7 @@ k       """)
 parser.add_argument('--ctest-options','-o',default="", help='Options to transmit to Ctest, ex: "--build-and-test --generator \"Unix Makefile\"", dont forget to quote!')
 parser.add_argument('tests', nargs='+', help="List of tests to run")
 parser.add_argument('--ctestPath','-p', default="ctest",help="The absolute path of ctest on the platform")
-parser.add_argument('--marks-dir','-d', default=".",help="The path to the directory where to put succeed marks")
+parser.add_argument('--marks-dirs','-d', action="append",required=True,help="A list of paths to succeed marks directories. The target is marked if in the first path. Every subsequent path will be writed at marked on success")
 parser.add_argument('--verbose','-v', action="store_true",help="verbose mode")
 
 args= parser.parse_args()
@@ -64,17 +64,18 @@ def last_test_passing(last_runned,ret):
     return [ x for x in last_runned if x not in failing]
 
 
-def get_success_file(target):
-    return args.marks_dir+'/'+target+"_succeed.marker"
+def get_success_files(target):
+    for mark in args.marks_dirs:
+        yield mark+'/'+target+"_succeed.marker"
 
 def mark_sucess(target):
     """Mark a target as succeed"""
-    f=get_success_file(target)
-    os.makedirs(args.marks_dir,  exist_ok=True)
-    Path(f).touch( exist_ok=True)
+    for i, f in enumerate(get_success_files(target)):
+        os.makedirs(args.marks_dirs[i],  exist_ok=True)
+        Path(f).touch(exist_ok=True)
 
 def is_marked(target):
-    return os.path.isfile(get_success_file(target))
+    return os.path.isfile(next(get_success_files(target)))
 
 def get_non_marked(test_list):
     """Return non marked test from the test_list"""

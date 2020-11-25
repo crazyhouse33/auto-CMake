@@ -69,14 +69,14 @@ Auto-cmake comes with a default source included test framework (https://nemequ.g
 The project define for you some handy targets:
 1. build-tests: Build all tests
 2. lazy-test: Test failing and outdated tests(it rebuild them before).
-2. lazy-mem-test: Test with memcheck failing and outdated tests. A passing test in the regular lazy-test is not passing for the lazy-mem-test
+2. lazy-mem-test: Test with memcheck failing and outdated tests. A passing test in the regular lazy-test is not passing for the lazy-mem-test.
 
 3. full-test: Force reconfiguration, recompilation of all, and run all tests with memcheck even if previously passed
 4. test (Default of CMake): Dont recompile anything and run all tests.
 
 
 Limitation: 
-1. The two last targets wont impact the lazy-targets (If a test pass with the test target, it will be re-run by the lazy target)
+1. test target wont impact the lazy-targets (If a test pass with the test target, it will be re-run by the lazy target)
 1. The lazy-(mem)-test always trigger the first test of the test suit using the make Generator. The bug is not apparent on the Ninja Generator. This seem to be a bug of CMake
 
 

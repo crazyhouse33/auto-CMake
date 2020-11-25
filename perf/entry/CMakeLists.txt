@@ -71,7 +71,6 @@ FOREACH(exec ${perf-exec_to_mesurate_size})
 ENDFOREACH()
 
 get_property(PERFS-COLLECTERS GLOBAL PROPERTY PERFS-COLLECTERS )
-message ("PERFS=${PERFS-COLLECTERS}")
 # Agregate all the kvf
 add_custom_command(OUTPUT "${DATA_PERF_DIR}/results/all.kvf"
 	COMMAND ${kvhfutils} kvf -m -o all.kvf
