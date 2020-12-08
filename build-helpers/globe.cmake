@@ -75,6 +75,9 @@ FUNCTION(dir_to_lib libmod dir target_name )
 	JOIN("${sources}" "\n\t\t" pretty)
 	message ("\n\tDetected sources:\n\n\t\t${pretty}")
 	
+	JOIN("${headers}" "\n\t\t" pretty)
+	message ("\n\tDetected headers:\n\n\t\t${pretty}")
+	
 	JOIN("${inc}" "\n\t\t" pretty)
 	message ("\n\tDetected includes:\n\n\t\t${pretty}")
 	add_library(${target_name} ${libmod} ${headers} ${sources})

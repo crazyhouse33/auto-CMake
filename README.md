@@ -20,6 +20,8 @@ This project expose others features tweakable in the main CMakeList, such as:
 
 Moreover, this cmake expose a cmake api in order to create more "suits" (called ring) 
 
+  
+
 
 # Usage
 Clone the repo, read this doc, replace/removes the existings files (used for my tests).  
@@ -121,6 +123,8 @@ The dev folder contain my githook based local continious integration tool. If yo
 
 # Got you
 2. You need to prevent CMake targets name collision. This mean for exemple that entries should have a different names, even across rings, but also that you cant use allready automatically defined targets. In particular, dont name an entry test.c, or you will run into really wierd bugs.
+
+3. The level of granularity of dependencie is terrible. Thus greatly reducing the use of the lazy-test/ perf targets. If you are aware of a way to improve this, I am really interested. For really long tests/perf recolts, you are free to compile an entry point as you want. If you name the target as the ring system would, the entry point will be latter ignored by the ring system.  
 
 
 # TODO
