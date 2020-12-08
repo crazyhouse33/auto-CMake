@@ -103,21 +103,26 @@ FUNCTION(ring_entries description)
 	endif()
 	foreach(file ${entries})
 		get_filename_component (name_without_extension ${file} NAME_WE)
-		get_entry_target(${file} ${name_without_extension} to_install)
-		if(${ring_instalable_entries})
-			INSTALL(TARGETS ${to_install}
-				)
+		get_entry_target_name( ${name_without_extension} name)
+		if (NOT TARGET ${name})# If target had been manually created, ignore
+			get_entry_target(${file} ${name})
+			if(${ring_instalable_entries})
+				INSTALL(TARGETS ${created_target})
+			endif()
 		endif()
 	endforeach()
 ENDFUNCTION()
 
-#DEFAULT get_entry_target overide if you need a different comportement for your ring. Use a maccro to benefit from some variables set higher(OUTPUT_DIR...)
-FUNCTION(get_entry_target path name to_install)
+#DEFAULT get_entry_target_name. If you want to change the way a target is named in your ring, overide
+FUNCTION(get_entry_target_name name new_name)
+	set (${new_name} ${name} PARENT_SCOPE) 
+ENDFUNCTION()
+
+#DEFAULT get_entry_target. Overide if you need a different comportement for your ring. Use a maccro to benefit from some variables set higher(OUTPUT_DIR...)
+FUNCTION(get_entry_target path name)
 	message("\t${path}")
 	add_executable(${name} ${path})
 	target_link_ring(${name})
-	set (${to_install} ${name} PARENT_SCOPE) 
-
 ENDFUNCTION()
 
 

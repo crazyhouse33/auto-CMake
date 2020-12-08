@@ -1,7 +1,11 @@
 #putting test in bin/test
 # We redefine the normal get_target_ macro to get must fail message and add to test suit
-FUNCTION(get_entry_target path name)
-	set (exec_name "test-${name}")
+
+FUNCTION(get_entry_target_name name new_name)
+	set (${new_name} "test-${name}" PARENT_SCOPE) 
+ENDFUNCTION()
+
+FUNCTION(get_entry_target path exec_name)
 	add_executable(${exec_name} ${path})
 	target_link_ring(${exec_name})
 	add_test(NAME ${exec_name} COMMAND ${exec_name} WORKING_DIRECTORY ${DATA_TEST_DIR})
@@ -37,15 +41,10 @@ ENDFUNCTION()
 # This call the previous function
 ring_entries("Test executable" ${DATA_TEST_DIR})
 
-set_property( GLOBAL PROPERTY TESTS "${TESTS}")
-
-
 #List additionnals dependencies of test here:
 
 #add_dependencies(executor child-buf-controle)
 
 #managing special dependencies
 #add_dependencies (integration authbreak)#integration test must provoke recompiling the soft
-
-
 
