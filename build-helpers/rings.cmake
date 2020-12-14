@@ -24,11 +24,10 @@ FUNCTION(ring_core)
 	endif()
 	my_manual_find_libs(${ring_name}) # Getting others libs the dirty way
 
-	#2 Getting lib from the intern ring
+	#2 Getting libs from the intern ring
 	message("\nInternal sources\n")
-
-	# Finding Externals libs
 	set (target_name RING_${ring_name})
+	#add_library(${target_name} INTERFACE )
 	dir_to_lib(${libmod} ${CMAKE_CURRENT_SOURCE_DIR} ${target_name})
 
 

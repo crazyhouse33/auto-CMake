@@ -76,8 +76,8 @@ set (perf-exec_to_mesurate_size "exec1;perf-empty")
 # Need to include after project call
 include(GNUInstallDirs) #system headers place
 set_if_not_set (SOURCELIBDIR ${CMAKE_BINARY_DIR}/backend_libs)
-set_if_not_set (DATA_TEST_DIR ${CMAKE_SOURCE_DIR}/test/data) 
-set_if_not_set (DATA_PERF_DIR ${CMAKE_SOURCE_DIR}/perf/data) 
+set_if_not_set (DATA_TEST_DIR ${CMAKE_SOURCE_DIR}/rings/test/data) 
+set_if_not_set (DATA_PERF_DIR ${CMAKE_SOURCE_DIR}/rings/perf/data) 
 
 
 
@@ -99,7 +99,7 @@ add_subdirectory(build-helpers/configure)
 #if we are not in master, we need to us templates to fill some files for master
 
 # Building main executable if there is and getting all src in a library
-add_subdirectory(code)
+add_subdirectory(rings/code)
 
 
 ##### TEST 
@@ -108,9 +108,9 @@ include (CTest)
 set(VALGRIND_COMMAND_OPTIONS "--error-exitcode=100")
 
 #Getting rings for developpers 
-add_subdirectory(test)
+add_subdirectory(rings/test)
 
-add_subdirectory(perf)
+add_subdirectory(rings/perf)
 
 
 

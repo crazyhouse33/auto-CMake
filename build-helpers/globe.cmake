@@ -1,3 +1,17 @@
+# Get directories in a directory, himself and hiden ones excluded
+FUNCTION (get_dirs dir res)
+	FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+	SET(dirlist "")
+	FOREACH(child ${children})
+		IF(IS_DIRECTORY ${curdir}/${child})
+			LIST(APPEND dirlist ${child})
+		ENDIF()
+	ENDFOREACH()
+	remove_hidden(${dir} ${children} end_res)
+	set (${res} ${end_res} PARENT_SCOPE)
+ENDFUNCTION()
+
+
 
 # Remove files contained in a hidden subdir 
 FUNCTION (remove_hidden basedir files out)
@@ -74,10 +88,10 @@ FUNCTION(dir_to_lib libmod dir target_name )
 
 	JOIN("${sources}" "\n\t\t" pretty)
 	message ("\n\tDetected sources:\n\n\t\t${pretty}")
-	
+
 	JOIN("${headers}" "\n\t\t" pretty)
 	message ("\n\tDetected headers:\n\n\t\t${pretty}")
-	
+
 	JOIN("${inc}" "\n\t\t" pretty)
 	message ("\n\tDetected includes:\n\n\t\t${pretty}")
 	add_library(${target_name} ${libmod} ${headers} ${sources})
