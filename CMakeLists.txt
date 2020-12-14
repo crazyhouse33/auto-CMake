@@ -48,9 +48,12 @@ set_if_not_set (INTERNAL_LIBS_MODE SHARED)
 #set_if_not_set (INTERNAL_LIBS_MODE_perf STATIC)
 
 # Uncomment one or both of thoses line to install coresspondings ring on the system. These will expose the lib in the same mode (STATIC/SHARED) as it was used with the previous variable
-#set_if_not_set (INSTALL_LIB_code my_lib_name) 
-#set_if_not_set (INSTALL_LIB_test my_lib_name)
-#set_if_not_set (INSTALL_LIB_perf my_lib_name)
+#set_if_not_set (INSTALL_RING_code my_lib_name) 
+#set_if_not_set (INSTALL_RING_test my_lib_name)
+#set_if_not_set (INSTALL_RING_perf my_lib_name)
+
+
+
 
 # Control external lib dependencies from the system. 
 set_if_not_set(LIB_FROM_SYSTEM_code "")
@@ -70,6 +73,26 @@ set (perf-allow-gone ON)
 # List to name of executable you want to monitor the size in the perfs
 set (perf-exec_to_mesurate_size "exec1;perf-empty")
 
+
+# DEFAULT
+# The following set up a default/exception system. You can change any default, BUT DONT COMMENT THEM
+
+# DEFAULT instability of libs (dirs in src) 
+set_if_not_set (INSTALL_LIB_code NO) 
+set_if_not_set (INSTALL_LIB_test NO)
+set_if_not_set (INSTALL_LIB_perf NO)
+
+# Uncomment to install the lib from dir1 in the code ring with given name
+#set_if_not_set (INSTALL_LIB_perf_code_dir1 the_name_of_the_final_lib)
+#...
+
+# DEFAULT instability of entries 
+set_if_not_set (INSTALL_ENTRY_code YES) 
+set_if_not_set (INSTALL_ENTRY_test NO)
+set_if_not_set (INSTALL_ENTRY_perf NO)
+
+# Uncomment to disable installation of entry entry3 from the code ring
+set_if_not_set (INSTALL_ENTRY_code_entry3 NO) 
 
 #STOP-MODIFY----------------------------------------------------------
 

@@ -1,5 +1,5 @@
 # Instalable targets and normal procedur eper entries
-init_ring(code YES)
+init_ring(code)
 
 add_subdirectory(src)
 

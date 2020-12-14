@@ -1,7 +1,6 @@
-# entries are not instalable
-init_ring(test NO)
+init_ring(test)
 
-# Places of markers for lazy testing (used by entryand lazy_testing cmake files)
+# Places of markers for lazy testing (used by entry and lazy_testing cmake files)
 set (marker_dir ${CMAKE_BINARY_DIR}/markers/test_succeed)
 set (marker_normal_dir ${marker_dir}/normal)
 set (marker_memory_dir ${marker_dir}/memory)

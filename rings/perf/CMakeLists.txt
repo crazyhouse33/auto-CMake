@@ -1,5 +1,4 @@
-# Uninstalable  entries, and we use the normal procedures for targets
-init_ring(perf NO)
+init_ring(perf)
 # Shared perf sources
 add_subdirectory(src)
 

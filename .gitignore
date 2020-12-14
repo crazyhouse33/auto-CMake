@@ -24,14 +24,14 @@ build/*
 
 # This is a stupid flaw of github. One solution would have to fragment data and binary, and include data. But then data must be no in the bin dir(otherwise we need to apply the same dirty fix, wich mean every test must refer to ../test data. Now ../data work on linux but not on every windows.
 bin/*
-test/data/results/*
+rings/test/data/results/*
 # test binaries
-test/data/test-* 
+rings/test/data/test-* 
 
 # perf binaries
-perf/data/perf-*
-perf/data/results/*
-!perf/data/results/history.kvhf
+rings/perf/data/perf-*
+rings/perf/data/results/*
+rings/perf/data/results/history.kvhf
 
 
 

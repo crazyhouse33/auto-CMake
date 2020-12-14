@@ -1,13 +1,13 @@
 # Get directories in a directory, himself and hiden ones excluded
 FUNCTION (get_dirs dir res)
-	FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+	FILE(GLOB children ${dir}/*)
 	SET(dirlist "")
 	FOREACH(child ${children})
-		IF(IS_DIRECTORY ${curdir}/${child})
+		IF(IS_DIRECTORY ${dir}/${child})
 			LIST(APPEND dirlist ${child})
 		ENDIF()
 	ENDFOREACH()
-	remove_hidden(${dir} ${children} end_res)
+	remove_hidden(${dir} "${dirlist}" end_res)
 	set (${res} ${end_res} PARENT_SCOPE)
 ENDFUNCTION()
 
