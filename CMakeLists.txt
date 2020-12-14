@@ -40,12 +40,13 @@ set_if_not_set(PROJECT_NAME ULL)
 set_if_not_set (version 0.6)
 
 # Set to STATIC or SHARED (SHARED should reduce build time)
-set_if_not_set (INTERNAL_LIBS_MODE SHARED)
+set_if_not_set (INTERNAL_LIB_MODE SHARED)
 
 # Uncomment to put a particular ring as static
-#set_if_not_set (INTERNAL_LIBS_MODE_code STATIC)
-#set_if_not_set (INTERNAL_LIBS_MODE_test STATIC)
-#set_if_not_set (INTERNAL_LIBS_MODE_perf STATIC)
+#set_if_not_set (INTERNAL_LIB_MODE_code STATIC)
+#set_if_not_set (INTERNAL_LIB_MODE_test STATIC)
+#set_if_not_set (INTERNAL_LIB_MODE_perf STATIC)
+#set_if_not_set (INTERNAL_LIB_MODE_EXT_SRC_perf STATIC) # You can controle the external sources mode as well for each rings
 
 # Uncomment one or both of thoses line to install coresspondings ring on the system. These will expose the lib in the same mode (STATIC/SHARED) as it was used with the previous variable
 #set_if_not_set (INSTALL_RING_code my_lib_name) 
@@ -75,18 +76,20 @@ set (perf-exec_to_mesurate_size "exec1;perf-empty")
 
 
 # DEFAULT
-# The following set up a default/exception system. You can change any default, BUT DONT COMMENT THEM
+# The following set up a default/exception system.  
 
-# DEFAULT instability of libs (dirs in src) 
-set_if_not_set (INSTALL_LIB_code NO) 
-set_if_not_set (INSTALL_LIB_test NO)
-set_if_not_set (INSTALL_LIB_perf NO)
+# DEFAULT instability of libs (dirs in src)
+set_if_not_set (INSTALL_LIB NO) 
+#YES install and keep same name (dir1 -> libdir1)
+#NO dont install
+#set_if_not_set (INSTALL_LIB_perf YES)
 
-# Uncomment to install the lib from dir1 in the code ring with given name
+# Uncomment to install the lib from dir1 in the code ring with given name.
+# If the name evaluate to false in the CMAke way, dont install
 #set_if_not_set (INSTALL_LIB_perf_code_dir1 the_name_of_the_final_lib)
 #...
 
-# DEFAULT instability of entries 
+# DEFAULT instability of entries: 
 set_if_not_set (INSTALL_ENTRY_code YES) 
 set_if_not_set (INSTALL_ENTRY_test NO)
 set_if_not_set (INSTALL_ENTRY_perf NO)

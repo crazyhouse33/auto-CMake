@@ -3,9 +3,6 @@
 MACRO(init_ring name)
 	message ("\n--------RING ${name}--------\n")
 	set(ring_name ${name})
-	if (NOT DEFINED INTERNAL_LIBS_MODE_${name})
-		set (libmod ${INTERNAL_LIBS_MODE})
-	endif()
 ENDMACRO()
 
 #  Get the ring global setting for the_stuff if it was not defined. If there is no global setting for the ring either, return the given fail value if given, otherwise fail
@@ -14,9 +11,11 @@ FUNCTION (ring_get_value prefix the_stuff result)
 	set (default_str "${prefix}_${ring_name}")
 	set (the_stuff_str "${default_str}_${the_stuff}")
 	if (DEFINED ${the_stuff_str})
-		set (${result} ${the_stuff_str} PARENT_SCOPE)
+		set (${result} ${${the_stuff_str}} PARENT_SCOPE)
 	elseif(DEFINED ${default_str})
-		set (${result} ${default_str} PARENT_SCOPE)
+		set (${result} ${${default_str}} PARENT_SCOPE)
+	elseif(DEFINED ${prefix})
+		set (${result} ${${prefix}} PARENT_SCOPE)
 	elseif(ARGN)
 		list(GET ARGN 0 fail)
 		set(${result} ${fail} PARENT_SCOPE)
@@ -42,20 +41,39 @@ FUNCTION(ring_core)
 	my_manual_find_libs(${ring_name}) # Getting others libs the dirty way
 
 	#2 Getting libs from the intern ring
+
+	set (target_name RING_${ring_name}) 
+	add_library(${target_name} INTERFACE)
 	message("\nInternal sources libs\n")
-	set (target_name RING_${ring_name})
-	dir_to_lib(${libmod} ${CMAKE_CURRENT_SOURCE_DIR} ${target_name})
+	
 	get_dirs( ${CMAKE_CURRENT_SOURCE_DIR} child_dirs)
 
-	#	FOREACH(dir ${child_dirs})
-	#		get_filename_component(the_dir ${dir} NAME)
-	#		ring_get_default(INSTALL_LIB ${the_dir})
-	#
-	#		
-	#			if (NOT ${the_dir} IN_LIST ${include_dirs})
-	#				LIST(APPEND ${include_dirs} ${the_dir})
-	#			endif()
-	#		ENDFOREACH()
+	FOREACH(dir ${child_dirs})
+		get_filename_component(the_dir ${dir} NAME)
+		# Getting user wanted name for lib
+		ring_get_value(INSTALL_LIB ${the_dir} install_lib)
+		if (install_lib)
+			if (${install_lib} EQUAL YES)
+				set  (lib_name ${the_dir})
+			else()
+				set (lib_name ${install_lib})
+			endif()
+		else()
+			set (lib_name SUBLIB_${ring_name}_${the_dir})
+		endif()
+		# Getting appropriate library mode
+		ring_get_value(INTERNAL_LIB_MODE ${lib_name} libmod)
+		message("\t${lib_name}(${libmod})")
+		dir_to_lib(${libmod} ${CMAKE_CURRENT_SOURCE_DIR} ${lib_name})
+		target_link_libraries(${target_name} INTERFACE ${lib_name})
+
+		#4 Install the lib if asked
+		if (install_lib)
+			set_target_properties(${target_name} PROPERTIES OUTPUT_NAME ${lib_name})
+			INSTALL(TARGETS ${lib_name} DESTINATION lib/${lib_name} PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${lib_name}")
+		endif()
+
+	ENDFOREACH()
 
 
 
@@ -66,7 +84,7 @@ FUNCTION(ring_core)
 	set(to_link EXT_SRC_${ring_name} ${EXTERNAL_LIBS_FROM_PROJECT} ${FOUNDED_LIBS})
 
 	message("\nLinked with: ${to_link}")
-	target_link_libraries( ${target_name} PUBLIC ${to_link} )
+	target_link_libraries( ${target_name} INTERFACE ${to_link} )
 
 	#4 Install the ring if asked
 	if (DEFINED INSTALL_RING_${ring_name})
@@ -98,6 +116,7 @@ ENDFUNCTION()
 FUNCTION(ring_ext_source )
 	message ("\nExternal source:\n")
 	set(ARCHIVE_OUTPUT_DIRECTORY ${SOURCELIBDIR})
+	ring_get_value(INTERNAL_LIB_MODE EXT_SRC_${ring_name} libmod)
 	dir_to_lib(${libmod} ${CMAKE_CURRENT_SOURCE_DIR} EXT_SRC_${ring_name})
 ENDFUNCTION()
 

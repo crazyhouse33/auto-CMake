@@ -1,5 +1,7 @@
-
+#include "another_lib.h"
 int main(){
-	return 0;
-
+	if (a==18)
+		return 0;
+	else
+		return 1;
 }
