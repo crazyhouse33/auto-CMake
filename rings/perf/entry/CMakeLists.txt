@@ -56,7 +56,7 @@ FOREACH(exec ${perf-exec_to_mesurate_size})
 	set(kvf_out ${DATA_PERF_DIR}/results/kvf/size_${exec}.kvf)
 	add_custom_command(OUTPUT ${kvf_out} 
 		COMMAND  ${CMAKE_COMMAND} -E remove ${kvf_out}
-		COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/build-helpers/scripts/add_size.py ${kvf_out} $<TARGET_FILE:${exec}> -n ${exec}_size
+		COMMAND ${PYTHON_EXECUTABLE} ${auto_cmake_dir}/scripts/add_size.py ${kvf_out} $<TARGET_FILE:${exec}> -n ${exec}_size
 		DEPENDS ${exec}
 
 		COMMENT "Collect size of ${exec}"

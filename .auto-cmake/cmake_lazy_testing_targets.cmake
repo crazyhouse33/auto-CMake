@@ -22,7 +22,7 @@ if (PYTHONINTERP_FOUND)
 	prefix( "${lazy_test_depends}" "${marker_normal_dir}/" lazy_test_depends )  
 
 	add_custom_command(OUTPUT ${lazy_test_depends}
-		COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/build-helpers/lazy-test-cache.py -v ${TESTS} --ctestPath ${CMAKE_CTEST_COMMAND} --marks-dirs ${marker_normal_dir}
+		COMMAND ${PYTHON_EXECUTABLE} ${auto_cmake_dir}/lazy-test-cache.py -v ${TESTS} --ctestPath ${CMAKE_CTEST_COMMAND} --marks-dirs ${marker_normal_dir}
 		DEPENDS ${TESTS}
 		COMMENT "Run all test that need to be run"
 		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
@@ -37,7 +37,7 @@ if (PYTHONINTERP_FOUND)
 	postfix( "${TESTS}" ${marker_suffix} lazy_test_mem_depends )  
 	prefix( "${lazy_test_mem_depends}" "${marker_memory_dir}/" lazy_test_mem_depends )  
 	add_custom_command(OUTPUT ${lazy_test_mem_depends}
-		COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/build-helpers/lazy-test-cache.py -v ${TESTS} --ctestPath ${CMAKE_CTEST_COMMAND} --marks-dirs ${marker_memory_dir} --marks-dirs ${marker_normal_dir} -o \"-T memcheck\"
+		COMMAND ${PYTHON_EXECUTABLE} ${auto_cmake_dir}/lazy-test-cache.py -v ${TESTS} --ctestPath ${CMAKE_CTEST_COMMAND} --marks-dirs ${marker_memory_dir} --marks-dirs ${marker_normal_dir} -o \"-T memcheck\"
 		COMMENT "Run all memory test that need to be run"
 		DEPENDS ${TESTS}
 		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}

@@ -27,13 +27,17 @@ working_configurations =['', '-DINTERAL_LIBS_MODE=STATIC',
 
 working_targets = ['all', 'lazy-mem-test',"perf-aggregate"]
 
-def test_integration():
+def check_configure():
+    assert os.path.isfile(root+'/rings/test/data/results/configure_test')
 
+def test_integration():
     for config in working_configurations:
         cmake_configure(config)
         cmake_build('clean')
         for target in working_targets:
             cmake_build(target)
+
+    check_configure()
 
 
 

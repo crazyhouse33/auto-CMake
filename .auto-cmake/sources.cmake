@@ -84,9 +84,12 @@ MACRO(get_sources directory include_dirs headers sources)
 
 ENDMACRO()
 
-FUNCTION (sources_to_lib inc headers sources lib_name lib_mode )
+FUNCTION (sources_to_lib inc headers sources target_name lib_name lib_mode )
 
-	set (target_name lib-${lib_name})
+	set(ARCHIVE_OUTPUT_DIRECTORY ${SOURCELIBDIR})
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SOURCELIBDIR})
+
+
 	add_library( ${target_name} ${libmod} ${headers} ${sources})
 	target_include_directories(${target_name} PUBLIC ${inc})
 	set_target_properties(${target_name} PROPERTIES PUBLIC_HEADER "${headers}")
@@ -106,7 +109,7 @@ FUNCTION(dir_to_lib dir lib_name libmod )
 
 	JOIN("${inc}" "\n\t\t" pretty)
 	message ("\n\tDetected includes:\n\n\t\t${pretty}")
-	sources_to_lib("${inc}" "${headers}" "${sources}" ${lib_name} ${libmod})
+	sources_to_lib("${inc}" "${headers}" "${sources}" lib-${lib_name} ${lib_name} ${libmod})
 ENDFUNCTION()
 
 
@@ -122,9 +125,9 @@ FUNCTION(reinstall_lib target mode)
 		get_target_property(sources ${target} SOURCES)
 		get_target_property(inc ${target} INCLUDE_DIRECTORIES)
 		get_target_property(headers ${target} PUBLIC_HEADER)
-		set (new_name __${lib_name}_COPY_${mode})
-		sources_to_lib( "${inc}" "${headers}" "${sources}" ${new_name} ${mode})
-		set (the_target_to_install ${new_name})
+		set (new_name ${lib_name}_COPY_${mode})
+		sources_to_lib( "${inc}" "${headers}" "${sources}" __lib-${new_name} ${new_name} ${mode})
+		set (the_target_to_install __lib-${new_name})
 	endif()
 
 		INSTALL(TARGETS ${the_target_to_install} DESTINATION lib/${lib_name} PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${lib_name}")

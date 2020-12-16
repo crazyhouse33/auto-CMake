@@ -6,6 +6,9 @@ set (marker_normal_dir ${marker_dir}/normal)
 set (marker_memory_dir ${marker_dir}/memory)
 set (marker_suffix "_succeed.marker")
 
+set(VALGRIND_COMMAND_OPTIONS "--error-exitcode=100")
+
+
 # Compile test internal lib and link to external 
 add_subdirectory(src)
 
@@ -16,7 +19,7 @@ add_subdirectory(entry)
 add_subdirectory(needed)
 
 #Adittional usefull test targets
-include(${CMAKE_SOURCE_DIR}/build-helpers/cmake_lazy_testing_targets.cmake) # need to be after test discovery
+include(${CMAKE_SOURCE_DIR}/.auto-cmake/cmake_lazy_testing_targets.cmake) # need to be after test discovery
 
 
 

@@ -80,7 +80,7 @@ FUNCTION(ring_core)
 
 		#4 Install the lib if asked
 		if (install_mode)
-			reinstall_lib(${lib_name} ${install_mode} )
+			reinstall_lib(lib-${lib_name} ${install_mode} )
 		endif()
 
 	ENDFOREACH()
@@ -124,9 +124,9 @@ ENDFUNCTION()
 
 # Accumulate sources from extneral project. Should be call in extern/ring/src 
 FUNCTION(ring_ext_source )
-	message ("\nExternal source:\n")
-	set(ARCHIVE_OUTPUT_DIRECTORY ${SOURCELIBDIR})
-	ring_get_value(INTERNAL_LIB_MODE EXT_SRC_${ring_name} libmod)
+
+	ring_get_value(EXTERNAL_SRC_MODE "" libmod)
+	message ("\nExternal source (${libmod}):\n")
 	dir_to_lib(${CMAKE_CURRENT_SOURCE_DIR} EXT_SRC_${ring_name} ${libmod}  )
 ENDFUNCTION()
 
