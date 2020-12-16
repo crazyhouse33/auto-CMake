@@ -84,7 +84,18 @@ MACRO(get_sources directory include_dirs headers sources)
 
 ENDMACRO()
 
-FUNCTION(dir_to_lib libmod dir target_name )
+FUNCTION (sources_to_lib inc headers sources lib_name lib_mode )
+
+	set (target_name lib-${lib_name})
+	add_library( ${target_name} ${libmod} ${headers} ${sources})
+	target_include_directories(${target_name} PUBLIC ${inc})
+	set_target_properties(${target_name} PROPERTIES PUBLIC_HEADER "${headers}")
+	set_target_properties(${target_name} PROPERTIES OUTPUT_NAME ${lib_name})
+
+
+ENDFUNCTION()
+
+FUNCTION(dir_to_lib dir lib_name libmod )
 	get_sources( ${dir} inc headers sources)
 
 	JOIN("${sources}" "\n\t\t" pretty)
@@ -95,8 +106,28 @@ FUNCTION(dir_to_lib libmod dir target_name )
 
 	JOIN("${inc}" "\n\t\t" pretty)
 	message ("\n\tDetected includes:\n\n\t\t${pretty}")
-	add_library(${target_name} ${libmod} ${headers} ${sources})
-	target_include_directories(${target_name} PUBLIC ${inc})
-	set_target_properties(${target_name} PROPERTIES PUBLIC_HEADER "${headers}")
+	sources_to_lib("${inc}" "${headers}" "${sources}" ${lib_name} ${libmod})
+ENDFUNCTION()
+
+
+# Install a library with given mode (SHARED...). If mode dont match the one at creation, create a copy with the good type and install it
+FUNCTION(reinstall_lib target mode)
+	
+	get_target_property(old_mode ${target} TYPE)
+	get_target_property(lib_name ${target} OUTPUT_NAME)
+
+	if (old_mode MATCHES ".*${mode}.*") # STATIC-lib->STATIC
+		set (the_target_to_install ${target})
+	else()
+		get_target_property(sources ${target} SOURCES)
+		get_target_property(inc ${target} INCLUDE_DIRECTORIES)
+		get_target_property(headers ${target} PUBLIC_HEADER)
+		set (new_name __${lib_name}_COPY_${mode})
+		sources_to_lib( "${inc}" "${headers}" "${sources}" ${new_name} ${mode})
+		set (the_target_to_install ${new_name})
+	endif()
+
+		INSTALL(TARGETS ${the_target_to_install} DESTINATION lib/${lib_name} PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${lib_name}")
 
 ENDFUNCTION()
+

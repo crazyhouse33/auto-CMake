@@ -1,10 +1,6 @@
 #putting test in bin/test
 # We redefine the normal get_target_ macro to get must fail message and add to test suit
 
-FUNCTION(get_entry_target_name name new_name)
-	set (${new_name} "test-${name}" PARENT_SCOPE) 
-ENDFUNCTION()
-
 FUNCTION(get_entry_target path exec_name)
 	add_executable(${exec_name} ${path})
 	target_link_ring(${exec_name})

@@ -8,10 +8,6 @@ endif()
 find_program(eprof_bin eprof REQUIRED)
 find_program(kvhfutils kvhfutils REQUIRED)
 
-FUNCTION(get_entry_target_name name new_name)
-	set (${new_name} "perf-${name}" PARENT_SCOPE) 
-ENDFUNCTION()
-
 FUNCTION(get_entry_target path exe_name)
 	message("\t${path}")
 	add_executable(${exe_name} ${path})

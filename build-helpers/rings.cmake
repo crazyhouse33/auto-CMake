@@ -51,26 +51,36 @@ FUNCTION(ring_core)
 	FOREACH(dir ${child_dirs})
 		get_filename_component(the_dir ${dir} NAME)
 		# Getting user wanted name for lib
-		ring_get_value(INSTALL_LIB ${the_dir} install_lib)
-		if (install_lib)
-			if (${install_lib} EQUAL YES)
-				set  (lib_name ${the_dir})
-			else()
-				set (lib_name ${install_lib})
-			endif()
+		set (rename ${RENAME_LIB_${ring_name}_${the_dir}})
+		if ( ${rename} )
+			set (lib_name ${${rename}})
 		else()
-			set (lib_name SUBLIB_${ring_name}_${the_dir})
-		endif()
+			set (lib_name ${RING_PREFIX_${ring_name}}${the_dir})
+		endif()		
+
 		# Getting appropriate library mode
-		ring_get_value(INTERNAL_LIB_MODE ${lib_name} libmod)
-		message("\t${lib_name}(${libmod})")
-		dir_to_lib(${libmod} ${CMAKE_CURRENT_SOURCE_DIR} ${lib_name})
-		target_link_libraries(${target_name} INTERFACE ${lib_name})
+		ring_get_value(INTERNAL_LIB_MODE ${the_dir} libmod)
+		
+		# Getting the appropriate library mode for installed version
+		ring_get_value(INSTALL_LIB_MODE ${the_dir} install_mode)
+
+		# Getting the installed mode
+		if(install_mode)
+			if (install_mode EQUAL SAME)
+				set (install_mode ${libmod})
+			endif()
+			set (install_message ", INSTALLED ${install_mode}")
+		endif()
+
+
+
+		message("\t${lib_name} (${libmod}${install_message})")
+		dir_to_lib(${CMAKE_CURRENT_SOURCE_DIR} ${lib_name} ${libmod} )
+		target_link_libraries(${target_name} INTERFACE lib-${lib_name})
 
 		#4 Install the lib if asked
-		if (install_lib)
-			set_target_properties(${target_name} PROPERTIES OUTPUT_NAME ${lib_name})
-			INSTALL(TARGETS ${lib_name} DESTINATION lib/${lib_name} PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${lib_name}")
+		if (install_mode)
+			reinstall_lib(${lib_name} ${install_mode} )
 		endif()
 
 	ENDFOREACH()
@@ -81,7 +91,7 @@ FUNCTION(ring_core)
 	get_property(EXTERNAL_LIBS_FROM_PROJECT GLOBAL PROPERTY EXTERNAL_LIBS_FROM_PROJECT_${ring_name})
 
 
-	set(to_link EXT_SRC_${ring_name} ${EXTERNAL_LIBS_FROM_PROJECT} ${FOUNDED_LIBS})
+	set(to_link lib-EXT_SRC_${ring_name} ${EXTERNAL_LIBS_FROM_PROJECT} ${FOUNDED_LIBS})
 
 	message("\nLinked with: ${to_link}")
 	target_link_libraries( ${target_name} INTERFACE ${to_link} )
@@ -117,7 +127,7 @@ FUNCTION(ring_ext_source )
 	message ("\nExternal source:\n")
 	set(ARCHIVE_OUTPUT_DIRECTORY ${SOURCELIBDIR})
 	ring_get_value(INTERNAL_LIB_MODE EXT_SRC_${ring_name} libmod)
-	dir_to_lib(${libmod} ${CMAKE_CURRENT_SOURCE_DIR} EXT_SRC_${ring_name})
+	dir_to_lib(${CMAKE_CURRENT_SOURCE_DIR} EXT_SRC_${ring_name} ${libmod}  )
 ENDFUNCTION()
 
 FUNCTION(ring_ext_lib)
@@ -149,20 +159,23 @@ FUNCTION(ring_entries description)
 	endif()
 	foreach(file ${entries})
 		get_filename_component (name_without_extension ${file} NAME_WE)
-		get_entry_target_name( ${name_without_extension} name)
-		if (NOT TARGET ${name})# If target had been manually created, ignore
+		# Process possible RENAME 
+		set (rename ${RENAME_ENTRY_${ring_name}_${file}})
+		if ( ${rename} )
+			set (name ${${rename}})
+		else()
+			set (name ${RING_PREFIX_${ring_name}}${name_without_extension})
+		endif()
+
+
+		if (NOT TARGET ${name})# If target had allready been manually created, ignore
 			get_entry_target(${file} ${name})
-			ring_get_value(INSTALL_ENTRY ${name} need_install )
+			ring_get_value(INSTALL_ENTRY ${name_without_extension} need_install )
 			if(${need_install})
 				INSTALL(TARGETS ${name})
 			endif()
 		endif()
 	endforeach()
-ENDFUNCTION()
-
-#DEFAULT get_entry_target_name. If you want to change the way a target is named in your ring, overide
-FUNCTION(get_entry_target_name name new_name)
-	set (${new_name} ${name} PARENT_SCOPE) 
 ENDFUNCTION()
 
 #DEFAULT get_entry_target. Overide if you need a different comportement for your ring. Use a maccro to benefit from some variables set higher(OUTPUT_DIR...)

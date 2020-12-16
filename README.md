@@ -122,7 +122,7 @@ The lazy targets(test and perf generation) are not tested.
 The dev folder contain my githook based local continious integration tool. If you share the hooks with the script in .git-hooks, the scripts will be firing at specified events.
 
 # Got you
-2. You need to prevent CMake targets name collision. This mean for exemple that entries should have a different names, even across rings, but also that you cant use allready automatically defined targets. In particular, dont name an entry test.c, or you will run into really wierd bugs.
+2. AutoCMake try to prevent you from running into name collision (libraries, targets...). But you may still run into them. For exemple if you use the default prefix setting and if you name a code entry test. Those colisions can be hard to understand, be aware. If you dont want to change a file system name, use RENAME\_LIB/ENTRY variable . 
 
 3. The level of granularity of dependencie is terrible. Thus greatly reducing the use of the lazy-test/ perf targets. If you are aware of a way to improve this, I am really interested. For really long tests/perf recolts, you are free to compile an entry point as you want. If you name the target as the ring system would, the entry point will be latter ignored by the ring system.  
 
