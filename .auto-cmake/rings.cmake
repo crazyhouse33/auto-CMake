@@ -1,8 +1,14 @@
 
 #Create variable of ring. if instalable_entries True entrie will be installed
-MACRO(init_ring name)
+MACRO(init_ring name entry_description)
 	message ("\n--------RING ${name}--------\n")
 	set(ring_name ${name})
+	set (ring_dir ${CMAKE_CURRENT_SOURCE_DIR})
+	#Setting up all code/libs
+	ring_core()
+
+	# Dealing with entries
+	ring_entries(${ring_dir}/entry ${entry_description})
 ENDMACRO()
 
 #  Get the ring global setting for the_stuff if it was not defined. If there is no global setting for the ring either, return the given fail value if given, otherwise fail
@@ -25,11 +31,12 @@ FUNCTION (ring_get_value prefix the_stuff result)
 
 ENDFUNCTION()
 
+#TODO Put part of this function into ring_init
 # Manage the src folder of a ring
 FUNCTION(ring_core)
 
-	#0 Recolt necessary extern dependencies for ring
-	add_subdirectory(${CMAKE_SOURCE_DIR}/extern/${ring_name} ${CMAKE_CURRENT_BINARY_DIR}/extern/${ring_name})
+	#0 Recolt necessary extern dependencies for ring (src and libs)
+	ring_ext_folder()
 
 	#1 Finding external libs
 	get_property(LIB_FROM_SYSTEM GLOBAL PROPERTY "LIB_FROM_SYSTEM_${ring_name}")
@@ -45,53 +52,14 @@ FUNCTION(ring_core)
 	set (target_name RING_${ring_name}) 
 	add_library(${target_name} INTERFACE)
 	message("\nInternal sources libs\n")
+
+	dir_to_sub_libs(${CMAKE_CURRENT_SOURCE_DIR}/src ${target_name} "")
 	
-	get_dirs( ${CMAKE_CURRENT_SOURCE_DIR} child_dirs)
-
-	FOREACH(dir ${child_dirs})
-		get_filename_component(the_dir ${dir} NAME)
-		# Getting user wanted name for lib
-		set (rename ${RENAME_LIB_${ring_name}_${the_dir}})
-		if ( ${rename} )
-			set (lib_name ${${rename}})
-		else()
-			set (lib_name ${RING_PREFIX_${ring_name}}${the_dir})
-		endif()		
-
-		# Getting appropriate library mode
-		ring_get_value(INTERNAL_LIB_MODE ${the_dir} libmod)
-		
-		# Getting the appropriate library mode for installed version
-		ring_get_value(INSTALL_LIB_MODE ${the_dir} install_mode)
-
-		# Getting the installed mode
-		if(install_mode)
-			if (install_mode EQUAL SAME)
-				set (install_mode ${libmod})
-			endif()
-			set (install_message ", INSTALLED ${install_mode}")
-		endif()
-
-
-
-		message("\t${lib_name} (${libmod}${install_message})")
-		dir_to_lib(${CMAKE_CURRENT_SOURCE_DIR} ${lib_name} ${libmod} )
-		target_link_libraries(${target_name} INTERFACE lib-${lib_name})
-
-		#4 Install the lib if asked
-		if (install_mode)
-			reinstall_lib(lib-${lib_name} ${install_mode} )
-		endif()
-
-	ENDFOREACH()
-
-
-
 	#3 Getting external libs from the ring
 	get_property(EXTERNAL_LIBS_FROM_PROJECT GLOBAL PROPERTY EXTERNAL_LIBS_FROM_PROJECT_${ring_name})
 
 
-	set(to_link lib-EXT_SRC_${ring_name} ${EXTERNAL_LIBS_FROM_PROJECT} ${FOUNDED_LIBS})
+	set(to_link EXT_SRC_${ring_name} ${EXTERNAL_LIBS_FROM_PROJECT} ${FOUNDED_LIBS})
 
 	message("\nLinked with: ${to_link}")
 	target_link_libraries( ${target_name} INTERFACE ${to_link} )
@@ -122,16 +90,20 @@ FUNCTION(target_link_ring target_to_link)
 ENDFUNCTION()
 
 
-# Accumulate sources from extneral project. Should be call in extern/ring/src 
-FUNCTION(ring_ext_source )
+# Accumulate sources from external project. Should be call in extern/ring/src 
+FUNCTION(ring_ext_folder )
+	# Adding manual libs
+	add_subdirectory(${ring_dir}/extern/lib)
 
-	ring_get_value(EXTERNAL_SRC_MODE "" libmod)
-	message ("\nExternal source (${libmod}):\n")
-	dir_to_lib(${CMAKE_CURRENT_SOURCE_DIR} EXT_SRC_${ring_name} ${libmod}  )
+	# Autodetecting sources
+	message ("\nExternal sources:\n")
+	add_library(EXT_SRC_${ring_name} INTERFACE)
+	dir_to_sub_libs(${ring_dir}/extern/src EXT_SRC_${ring_name} "EXT")
+
 ENDFUNCTION()
 
 FUNCTION(ring_ext_lib)
-	message ("\nExternal libraries\n")
+	message ("\nManual libraries:\n")
 	MACRO(add_to_fs_libs lib)
 		message ("\tGot ${lib}")
 		get_property(tmp GLOBAL PROPERTY EXTERNAL_LIBS_FROM_PROJECT_${ring_name})
@@ -144,23 +116,19 @@ FUNCTION(ring_ext_lib)
 	#add_include_dirs_target( ${CMAKE_CURRENT_SOURCE_DIR} EXT_SRC_${ring_name})
 ENDFUNCTION()
 
-FUNCTION(ring_entries description)
-	set (dest ${PROJECT_SOURCE_DIR}/bin/${ring_name})
-	if (ARGN)
-		list(GET ARGN 0 dest)
-	endif()
-
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${dest})
+# Collect entries in dir. The function call get_entry_target. The User can overide the default given function to get different behaviour
+FUNCTION(ring_entries dir description)
 
 	#compile ext-test ones, which are just unrelated programs
-	file(GLOB_RECURSE entries CONFIGURE_DEPENDS *.c)
+	file(GLOB_RECURSE entries CONFIGURE_DEPENDS ${dir}/*.c)
 	if(entries)
 		message("\n${description}:\n")
 	endif()
 	foreach(file ${entries})
+
 		get_filename_component (name_without_extension ${file} NAME_WE)
 		# Process possible RENAME 
-		set (rename ${RENAME_ENTRY_${ring_name}_${file}})
+		set (rename ${RENAME_ENTRY_${ring_name}_${name_without_extension}})
 		if ( ${rename} )
 			set (name ${${rename}})
 		else()
@@ -169,7 +137,14 @@ FUNCTION(ring_entries description)
 
 
 		if (NOT TARGET ${name})# If target had allready been manually created, ignore
+
 			get_entry_target(${file} ${name})
+
+			ring_get_value(RING_ENTRY_BIN_OUTPUT ${name_without_extension} destination ${PROJECT_SOURCE_DIR}/bin/${ring_name} )
+			set_target_properties(${name}
+				PROPERTIES
+				RUNTIME_OUTPUT_DIRECTORY ${destination} 
+				)
 			ring_get_value(INSTALL_ENTRY ${name_without_extension} need_install )
 			if(${need_install})
 				INSTALL(TARGETS ${name})

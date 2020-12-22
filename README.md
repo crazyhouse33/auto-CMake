@@ -4,21 +4,23 @@ My Cmake based build system.
 I share this as it is (Maybe broken), and I wont maintain a clean git.
 
 # Goal
-Facilitate start of C projects by exposing most of cmake functionnalities in a file system interface and a conf file. 
+Facilitate start of C projects by exposing most of cmake functionnalities in a file system interface and a central conf file. 
 
 # Features
 This project provides out of the box:
 1. Incremental Test suit (with monkeypatching support) 
 2. Incremental Perf suit (with monkeypatching support)
-1. Easy configuration (In the CMake sens) 
-3. Easy exportation of your sources into separated tweakable libraries 
-2. Easy External project inclusion (by source, system, or manually compiled library)
+1. Easy configuration steps(In the CMake sens) 
+3. Easy exportation of your sources into separated tweakable libraries
+2. Easy external project inclusion (by source, system, or manually compiled library)
 
 
 Moreover, this cmake expose a cmake api in order to create more "suits" (called ring), and other usefull functions that you may use.
 
 # Usage
 Clone the repo, read this doc, put your sources where there belong to achieve the build you want. Take a look at exemples in this repo (used for my tests). 
+
+Then, run use CMake/the chosen generator the normal way from the build directory.
 
 # Organisation
 
@@ -41,12 +43,22 @@ The src folder contains the inner sources accessible from the entries of the cur
 Each directory in this folder is going to be represent a library that you can independently configure (static/shared, install or not...) in the conf file. 
 
 ### Extern project 
-Each extern project will be in the root extern directory, and the path will decide how and to which ring it will be added:
-1. Source inclusion: extern/space/src: This will add the project sources to the ring.  
-2. Lib creation: extern/space/lib: Nothing magical is done there. You have to manually create a library in the CMakelist, and add it to be linked against (see exemple in normal/lib CMakelist).
+Each ring can use external project sources, and the consecutive folder will decide how it will be added:
+1. Source inclusion: extern/src: This will add the project sources to the ring the same way it work with the regular src folder. In particular you will be able to control each libraries created by each folder in the conf file(Install lib, static or shared inclusion...).  
+2. Lib creation: extern/lib: Nothing magical is done there. This is here to allow you to manually set up libraries to link to from an extern project with the standar CMake process. Use the provided function to indicate which libs the ring will use. (see exemple in code/extern/lib CMakelist).
 
-For each ring, you can also ask for a system library, via the LIB\_FROM\_SYSTEM\_RING variable in the autocmake confs.
+### Conf file
+In auto-cmake.conf you will find a cmake file containing all the variables necessary to interact with autocmake. 
 
+The majority of these variables works with modifiables default for each rings that you can change, and you can specify exceptions. For exemple:
+
+1. **The variable INSTALL\_LIB\_MODE** control the default mode of installation for all rings
+2. **INSTALL\_LIB\_MODE\_code** is the default for the code ring
+3. **INSTALL\_LIB\_MODE\_code\_lib1** control the the mode for the particular folder lib1 in code/src.
+
+The files aim to give a good amount of flexibility and allow for a lot of things. For exemple, you can decide to install or not some part of your code with a different mode than the way it will be included in your entries. See the exemple to see what you can set.
+
+This file contain also some more important variables that will lickely need changes across project. For exemple rings will be able linked to libs from the system via **LIB\_FROM\_SYSTEM\_code**.
 
 ## Entry type
 ### Code ###
@@ -66,7 +78,6 @@ The project define for you some handy targets:
 1. build-tests: Build all tests
 2. lazy-test: Test failing and outdated tests( rebuild them before).
 2. lazy-mem-test: Test with memcheck failing and outdated tests. A passing test in the regular lazy-test is not passing for the lazy-mem-test.
-
 3. full-test: Force reconfiguration, recompilation of all, and run all tests with memcheck even if previously passed.
 4. test (Default of CMake): Dont recompile anything and run all tests.
 
@@ -91,13 +102,10 @@ The mains targets are :
 Auto-cmake comes with my default block-profiling framework. It get it from the system (I did not include it in source because you need a python executable anyway). You can either install it (https://github.com/crazyhouse33/eprof) or use another one. In the latter case you need to modify the perf/entry CMakeList properly so the perfs-targets works.
 
 ## Configuration
-The cmake configuration feature can be used trought the auto-cmake.conf/configure/ folder. Any "file to be configured by CMake" will be configured in the mirored path relative to the CMake source dir.
+The cmake configuration feature can be used trought the auto-cmake.conf/configure/ folder. Any "file to be configured by CMake" will be configured in the mirored path relative to the CMake source dir when you run CMake.
 
 # Not tested
 The project is not tested as well as it should, because it is particulary annoying to set up entires dummy C projects to test features independently, or proper dependencies.. 
-
-## Needed
-The repertory work like the normal test entry. However, the resulted executable wont be run in a test-suit. This is needed when you need to compile an executable for one of your test to run on. **Dont forget to add the dependency**
 
 ## Install lib/ring
 The rings can be instalable as libraries. Any sub lib of the internal source of a ring can also be instaled separatly. Check conf file (INSTALL\_LIB\_MODE)

@@ -1,4 +1,3 @@
-#putting test in bin/test
 ring_entries("External executables for perfs" ${DATA_PERF_DIR}/bin)
 
 

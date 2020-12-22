@@ -1,9 +1,104 @@
-init_ring(perf)
-# Shared perf sources
-add_subdirectory(src)
 
-# Compile and link perf collecters
-add_subdirectory(entry)
+add_custom_target(__perf-collect-all)
+
+if(perf-allow-gone)
+	set (allow-gone-opt "--allow-gone-key")
+endif()
+
+
+find_program(eprof_bin eprof REQUIRED)
+find_program(kvhfutils kvhfutils REQUIRED)
+
+FUNCTION(get_entry_target path exe_name)
+	message("\t${path}")
+	add_executable(${exe_name} ${path})
+	set (recolt_out "${RING_ENTRY_BIN_OUTPUT_perf}/results/${name}")
+	set (recolt_out_file ${recolt_out}/S)
+	target_compile_definitions(${exe_name} PUBLIC EPROF_OUTPUT=\"${recolt_out}\")
+	target_link_ring(${exe_name})
+
+	set (target_recolt "__perf-collect-${name}")
+
+	add_custom_command(OUTPUT ${recolt_out_file}
+		COMMAND ${exe_name}
+		COMMENT "Running perf executable ${exe_name}"
+		DEPENDS ${exe_name}
+		WORKING_DIRECTORY ${RING_ENTRY_BIN_OUTPUT_perf}
+		)
+
+	set (kvf_out ${RING_ENTRY_BIN_OUTPUT_perf}/results/kvf/${name}.kvf)
+
+	add_custom_command(OUTPUT ${kvf_out}
+		COMMAND ${eprof_bin} ${recolt_out} -o ${kvf_out} 
+		DEPENDS ${recolt_out_file}
+		WORKING_DIRECTORY ${RING_ENTRY_BIN_OUTPUT_perf}
+		COMMENT "Transforming ${name} eprof output to kvf"
+		)
+	add_custom_target(${target_recolt}
+		DEPENDS ${kvf_out}
+		WORKING_DIRECTORY ${RING_ENTRY_BIN_OUTPUT_perf}
+		)
+
+	# Adding to the list of perfs for latter dependencies 
+	get_property(PERFS-COLLECTERS GLOBAL PROPERTY PERFS-COLLECTERS )
+	LIST (APPEND PERFS-COLLECTERS ${kvf_out})
+	set_property( GLOBAL PROPERTY PERFS-COLLECTERS ${PERFS-COLLECTERS})
+
+	add_dependencies( __perf-collect-all  ${target_recolt} )
+	#set (${to_install} ${name} PARENT_SCOPE) # It does not make sense to install perf suit
+ENDFUNCTION()
+
+init_ring(perf "Performance collecter")
+
+
+add_custom_target(__perf-collect-size-all)
+
+
+FOREACH(exec ${perf-exec_to_mesurate_size})
+	set(kvf_out ${RING_ENTRY_BIN_OUTPUT_perf}/results/kvf/size_${exec}.kvf)
+	add_custom_command(OUTPUT ${kvf_out} 
+		COMMAND  ${CMAKE_COMMAND} -E remove ${kvf_out}
+		COMMAND ${PYTHON_EXECUTABLE} ${auto_cmake_dir}/scripts/add_size.py ${kvf_out} $<TARGET_FILE:${exec}> -n ${exec}_size
+		DEPENDS ${exec}
+
+		COMMENT "Collect size of ${exec}"
+		)
+	LIST( APPEND PERFS-COLLECTERS-SIZE ${kvf_out})
+
+	add_custom_target(__perf-collect-size-${exec}
+		DEPENDS ${kvf_out}
+		)
+	add_dependencies(__perf-collect-size-all __perf-collect-size-${exec})
+ENDFOREACH()
+
+get_property(PERFS-COLLECTERS GLOBAL PROPERTY PERFS-COLLECTERS )
+# Agregate all the kvf
+add_custom_command(OUTPUT "${RING_ENTRY_BIN_OUTPUT_perf}/results/all.kvf"
+	COMMAND ${kvhfutils} kvf -m -o all.kvf
+	WORKING_DIRECTORY ${RING_ENTRY_BIN_OUTPUT_perf}/results
+	COMMENT "Merging every kvf files into all.kvf"
+	DEPENDS ${PERFS-COLLECTERS-SIZE} ${PERFS-COLLECTERS} 
+	)
+
+add_custom_target(perf-aggregate
+	DEPENDS "${RING_ENTRY_BIN_OUTPUT_perf}/results/all.kvf")
+
+add_custom_target(perf-check-resume
+	COMMAND ${kvhfutils} --required-length 1 --check-file --actualized all.kvf
+	WORKING_DIRECTORY ${RING_ENTRY_BIN_OUTPUT_perf}/results
+	COMMENT "Checking correctness of all.kvf"
+	)
+
+add_custom_target(perf-save-resume
+	COMMAND kvhfutils -o history.kvhf --historic-merge history.kvhf all.kvf ${allow-gone-opt}
+	WORKING_DIRECTORY ${RING_ENTRY_BIN_OUTPUT_perf}/results
+	COMMENT "Adding all.kvf to the history"
+	)
+add_dependencies(perf-save-resume perf-check-resume)
+
+
+
+
 
 # Compile external programs needed for tests
 add_subdirectory(needed)

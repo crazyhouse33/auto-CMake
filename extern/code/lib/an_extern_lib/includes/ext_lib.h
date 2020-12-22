@@ -1,1 +1,0 @@
-void ext_lib();

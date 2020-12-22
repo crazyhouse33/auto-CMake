@@ -6,8 +6,6 @@ include(GNUInstallDirs) #system headers place
 
 # Set place for data
 set_if_not_set (SOURCELIBDIR ${CMAKE_BINARY_DIR}/backend_libs)
-set_if_not_set (DATA_TEST_DIR ${CMAKE_SOURCE_DIR}/rings/test/data) 
-set_if_not_set (DATA_PERF_DIR ${CMAKE_SOURCE_DIR}/rings/perf/data) 
 
 
 
