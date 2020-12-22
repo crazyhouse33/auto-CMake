@@ -2,6 +2,9 @@
 
 # Need to include after project call
 include(GNUInstallDirs) #system headers place
+include(${auto_cmake_dir}/linker_map.cmake) # Function to produce a linker map (need cmake project() call)
+include(${auto_cmake_dir}/language.cmake) # Get c++ or C variable (need cmake project() call)
+
 
 
 # Set place for data
@@ -10,7 +13,7 @@ set_if_not_set (SOURCELIBDIR ${CMAKE_BINARY_DIR}/backend_libs)
 
 
 #Setting use compilation options
-#set(CMAKE_C_FLAGS_DEBUG "-ggdb3")
+set(CMAKE_C_FLAGS_DEBUG "-ggdb3")
 # Color output
 set(CMAKE_C_FLAGS "-fdiagnostics-color=always")
 

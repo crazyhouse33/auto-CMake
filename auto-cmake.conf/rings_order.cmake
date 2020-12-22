@@ -8,8 +8,9 @@ else()
 	set (BUILD_TEST ON)
 	set (BUILD_PERF ON)
 	set (CMAKE_BUILD_TYPE Debug) 
-
 endif()
+
+message("\nBuild Mode: ${CMAKE_BUILD_TYPE}")
 
 # We always use rings/code
 add_subdirectory(rings/code)

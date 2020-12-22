@@ -1,14 +1,6 @@
 # From a package that had been found, found a lib. The approach is to implement unsuported conventions till supporting most of the cases
 
 FUNCTION(package_to_lib package res)
-	get_property(languages GLOBAL PROPERTY ENABLED_LANGUAGES)
-
-	if("CXX" IN_LIST languages)
-		set (languages CXX)
-	elseif("C" IN_LIST languages)
-		set (languages C)
-	endif()
-
 	# Pass trought convention
 	set(identityconv ${package})
 	if (TARGET ${identityconv})
@@ -16,7 +8,7 @@ FUNCTION(package_to_lib package res)
 	endif()
 
 	#OpenMP convention
-	set (ompconv "${package}::${package}_${languages}") 
+	set (ompconv "${package}::${package}_${C_OR_CPP_LANG}") 
 	if (TARGET ${ompconv})
 		set(${res} ${ompconv} PARENT_SCOPE)
 	endif()

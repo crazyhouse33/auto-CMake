@@ -149,6 +149,8 @@ FUNCTION(ring_entries dir description)
 			if(${need_install})
 				INSTALL(TARGETS ${name})
 			endif()
+
+			produce_linker_map(${name} ${name}.map)
 		endif()
 	endforeach()
 ENDFUNCTION()

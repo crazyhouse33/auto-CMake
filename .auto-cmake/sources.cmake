@@ -96,14 +96,8 @@ FUNCTION (sources_to_lib inc headers sources target_name lib_name lib_mode )
 	set_target_properties(${target_name} PROPERTIES PUBLIC_HEADER "${headers}")
 	set_target_properties(${target_name} PROPERTIES OUTPUT_NAME ${lib_name})
 	if (NOT sources) #https://stackoverflow.com/questions/11801186/cmake-unable-to-determine-linker-language-with-c
-		get_property(languages GLOBAL PROPERTY ENABLED_LANGUAGES)
-		if("CXX" IN_LIST languages)
-			set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE CXX)
-		elseif("C" IN_LIST languages)
+		set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE ${C_OR_CPP_LANG})
 
-			set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE C)
-
-		endif()
 	endif()
 
 
